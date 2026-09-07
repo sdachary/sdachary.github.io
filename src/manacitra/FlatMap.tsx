@@ -210,6 +210,45 @@ function buildRoutes(data: ManacitraData, cards: ZoneCard[]) {
     return t.y - TILE_GAP + 4 + (k % 6) * 3;
   };
 
+  // fan out arrows that share a gutter: intra-card tile-gutter x, and cross-card entry gutter x
+  const gutterCount = new Map<number, number>();
+  const gutterOffCount = new Map<string, number>();
+  const gutterOff = (t: Tile) => {
+    const k = gutterOffCount.get(t.id) ?? 0;
+    gutterOffCount.set(t.id, k + 1);
+    return k * 6;
+  };
+
+  // horizontal lane allocator: never let two routes place a horizontal run at the same y over an overlapping x-range
+  const hBuckets = new Map<number, Set<number>>();
+  const claimH = (x0: number, x1: number, prefY: number) => {
+    if (x1 < x0) [x0, x1] = [x1, x0];
+    const b0 = Math.floor(x0 / 20), b1 = Math.floor(x1 / 20);
+    const used = (y: number) => {
+      for (let b = b0; b <= b1; b++) {
+        const s = hBuckets.get(b);
+        if (s && s.has(y)) return true;
+      }
+      return false;
+    };
+    const base = Math.round(prefY);
+    let y = base, delta = 0, dir = 6;
+    while (used(y)) {
+      delta += dir;
+      y = base + delta;
+      dir = -dir;
+    }
+    for (let b = b0; b <= b1; b++) {
+      let s = hBuckets.get(b);
+      if (!s) {
+        s = new Set();
+        hBuckets.set(b, s);
+      }
+      s.add(y);
+    }
+    return y;
+  };
+
   const routes: Route[] = [];
   const intraRoutes: Route[] = [];
 
@@ -245,9 +284,23 @@ function buildRoutes(data: ManacitraData, cards: ZoneCard[]) {
     byToCard.set(key, list);
   }
   for (const list of byToCard.values()) {
-    const fc = cardOf(list[0].from.id)!;
-    const tc = cardOf(list[0].to.id)!;
-    const corridorMin = fc.x + fc.w + 12;
+    const fc = cardById(cards, list[0].from.id)!;
+    const tc = cardById(cards, list[0].to.id)!;
+    // a blocking card pokes into the corridor AND its y-range overlaps the travel band between the two cards
+    const travelMin = Math.min(fc.y, tc.y);
+    const travelMax = Math.max(fc.y + fc.h, tc.y + tc.h);
+    const blockerRight = Math.max(
+      0,
+      ...cards.filter(c =>
+        c.zone.id !== list[0].from.id &&
+        c.zone.id !== list[0].to.id &&
+        c.x < tc.x &&
+        c.x + c.w > fc.x + fc.w &&
+        c.y < travelMax &&
+        c.y + c.h > travelMin,
+      ).map(c => c.x + c.w + 12),
+    );
+    const corridorMin = Math.max(fc.x + fc.w + 12, blockerRight);
     const corridorMax = tc.x - 12;
     const total = list.reduce((s, f) => s + f.conns.length, 0);
     let offset = 0;
@@ -277,6 +330,7 @@ function buildRoutes(data: ManacitraData, cards: ZoneCard[]) {
   const srcRowUsed = new Map<string, number>();
   const dstRowCounts = new Map<string, number>();
   const dstRowUsed = new Map<string, number>();
+  const leftRowCounts = new Map<string, number>();
   for (const c of rightConnList) {
     const sk = srcRowKey(c);
     if (sk) srcRowCounts.set(sk, (srcRowCounts.get(sk) ?? 0) + 1);
@@ -297,7 +351,10 @@ function buildRoutes(data: ManacitraData, cards: ZoneCard[]) {
       const b = tileOf.get(conn.to);
       if (!a || !b) return;
       const sy = nextSrc(a.tile);
-      const lx = a.tile.x - TILE_GAP / 2;
+      const baseLX = a.tile.x - TILE_GAP / 2;
+      const gl = gutterCount.get(baseLX) ?? 0;
+      gutterCount.set(baseLX, gl + 1);
+      const lx = baseLX - gl * 4;
       const lane = nextDstLane(b.tile);
       const tx = nextDst(b.tile);
       const d = `M ${a.tile.x} ${sy} H ${lx} V ${lane} H ${tx} V ${b.tile.y}`;
@@ -344,17 +401,21 @@ function buildRoutes(data: ManacitraData, cards: ZoneCard[]) {
           const y = dstT.tile.y + 10 + (n > 1 ? (u / (n - 1)) * (TILE - 20) : (TILE - 20) / 2);
           return { x: toCard.x, y: clamp(y, toCard.y + PAD + 4, toCard.y + toCard.h - PAD - 6) };
         })();
-        const gutterX = toCard.x + PAD / 2;
-        const lane = nextDstLane(dstT.tile);
+        const gutterX = toCard.x + PAD / 2 + gutterOff(dstT.tile);
         const tx = nextDst(dstT.tile);
-        const d = `M ${src.x} ${src.y} H ${laneX} V ${entry.y} H ${gutterX} V ${lane} H ${tx} V ${dstT.tile.y}`;
-        routes.push({ d, end: { x: tx, y: dstT.tile.y }, angle: 90, label: { x: laneX + 8, y: (src.y + entry.y) / 2 }, from: conn.from, to: conn.to, labelText: conn.label });
+        const lane = claimH(gutterX, tx, nextDstLane(dstT.tile));
+        const srcY = claimH(src.x, laneX, src.y);
+        const entryY = claimH(laneX, gutterX, entry.y);
+        const d = `M ${src.x} ${srcY} H ${laneX} V ${entryY} H ${gutterX} V ${lane} H ${tx} V ${dstT.tile.y}`;
+        routes.push({ d, end: { x: tx, y: dstT.tile.y }, angle: 90, label: { x: laneX + 8, y: (srcY + entryY) / 2 }, from: conn.from, to: conn.to, labelText: conn.label });
         return;
       }
 
       const dst = { x: toCard.x, y: toCard.y + PAD + (laneX - (fromCard.x + fromCard.w + 12)) / ((toCard.x - 12) - (fromCard.x + fromCard.w + 12)) * (toCard.h - PAD * 2) };
-      const d = `M ${src.x} ${src.y} H ${laneX} V ${dst.y} H ${dst.x}`;
-      routes.push({ d, end: dst, angle: 0, label: { x: laneX + 8, y: (src.y + dst.y) / 2 }, from: conn.from, to: conn.to, labelText: conn.label });
+      const srcY = claimH(src.x, laneX, src.y);
+      const dY = claimH(laneX, dst.x, dst.y);
+      const d = `M ${src.x} ${srcY} H ${laneX} V ${dY} H ${dst.x}`;
+      routes.push({ d, end: dst, angle: 0, label: { x: laneX + 8, y: (srcY + dY) / 2 }, from: conn.from, to: conn.to, labelText: conn.label });
       return;
     }
 
@@ -362,22 +423,32 @@ function buildRoutes(data: ManacitraData, cards: ZoneCard[]) {
     if (toCard.x + toCard.w <= fromCard.x) {
       const srcT = tileOf.get(conn.from);
       const dstT = tileOf.get(conn.to);
+      const exRow = srcT ? `${fromCard.y}|${rowOf(srcT.tile.y, fromCard)}` : null;
+      const eIdx = exRow ? (() => {
+        const n = leftRowCounts.get(exRow) ?? 0;
+        leftRowCounts.set(exRow, n + 1);
+        return n;
+      })() : 0;
       const src = srcT
-        ? { x: fromCard.x, y: clamp(srcT.tile.y + TILE / 2, fromCard.y + PAD + 4, fromCard.y + fromCard.h - PAD - 4) }
+        ? { x: fromCard.x, y: clamp(srcT.tile.y + 6 + eIdx * 8, fromCard.y + PAD + 4, fromCard.y + fromCard.h - PAD - 4) }
         : edgePoint(fromCard, 'l', 0.5);
       const laneX = (fromCard.x + toCard.x + toCard.w) / 2;
       if (dstT) {
         const entry = { x: toCard.x + toCard.w, y: clamp(dstT.tile.y + TILE / 2, toCard.y + PAD + 4, toCard.y + toCard.h - PAD - 6) };
-        const gutterX = toCard.x + toCard.w - PAD / 2;
-        const lane = nextDstLane(dstT.tile);
+        const gutterX = toCard.x + toCard.w - PAD / 2 - gutterOff(dstT.tile);
         const tx = nextDst(dstT.tile);
-        const d = `M ${src.x} ${src.y} H ${laneX} V ${entry.y} H ${gutterX} V ${lane} H ${tx} V ${dstT.tile.y}`;
-        routes.push({ d, end: { x: tx, y: dstT.tile.y }, angle: 90, label: { x: laneX - 8, y: (src.y + entry.y) / 2 }, from: conn.from, to: conn.to, labelText: conn.label });
+        const lane = claimH(gutterX, tx, nextDstLane(dstT.tile));
+        const sY = claimH(src.x, laneX, src.y);
+        const eY = claimH(laneX, gutterX, entry.y);
+        const d = `M ${src.x} ${sY} H ${laneX} V ${eY} H ${gutterX} V ${lane} H ${tx} V ${dstT.tile.y}`;
+        routes.push({ d, end: { x: tx, y: dstT.tile.y }, angle: 90, label: { x: laneX - 8, y: (sY + eY) / 2 }, from: conn.from, to: conn.to, labelText: conn.label });
         return;
       }
       const dst = edgePoint(toCard, 'r', clamp((src.y - toCard.y) / toCard.h, 0.15, 0.85));
-      const d = `M ${src.x} ${src.y} H ${laneX} V ${dst.y} H ${dst.x}`;
-      routes.push({ d, end: dst, angle: 180, label: { x: laneX - 8, y: (src.y + dst.y) / 2 }, from: conn.from, to: conn.to, labelText: conn.label });
+      const sY = claimH(src.x, laneX, src.y);
+      const dY = claimH(laneX, dst.x, dst.y);
+      const d = `M ${src.x} ${sY} H ${laneX} V ${dY} H ${dst.x}`;
+      routes.push({ d, end: dst, angle: 180, label: { x: laneX - 8, y: (sY + dY) / 2 }, from: conn.from, to: conn.to, labelText: conn.label });
       return;
     }
 
@@ -391,7 +462,7 @@ function buildRoutes(data: ManacitraData, cards: ZoneCard[]) {
       const dst = dstT
         ? { x: clamp(dstT.tile.x + TILE / 2, toCard.x + PAD + 6, toCard.x + toCard.w - PAD - 6), y: toCard.y }
         : edgePoint(toCard, 't', 0.5);
-      const midY = (src.y + dst.y) / 2;
+      const midY = claimH(src.x, dst.x, (src.y + dst.y) / 2);
       const d = `M ${src.x} ${src.y} V ${midY} H ${dst.x} V ${dst.y}`;
       routes.push({ d, end: dst, angle: 90, label: { x: (src.x + dst.x) / 2, y: midY - 6 }, from: conn.from, to: conn.to, labelText: conn.label });
       return;
@@ -414,7 +485,7 @@ function buildRoutes(data: ManacitraData, cards: ZoneCard[]) {
         return tc.y + tc.h <= fc.y;
       });
       const pos = Math.max(0, upConns.findIndex(c => c.from === conn.from && c.to === conn.to));
-      const laneY = corridorMin + ((pos + 0.5) / Math.max(1, upConns.length)) * (corridorMax - corridorMin);
+      const laneY = claimH(src.x, dst.x, corridorMin + ((pos + 0.5) / Math.max(1, upConns.length)) * (corridorMax - corridorMin));
       const d = `M ${src.x} ${src.y} V ${laneY} H ${dst.x} V ${dst.y}`;
       routes.push({ d, end: dst, angle: -90, label: { x: (src.x + dst.x) / 2, y: laneY - 6 }, from: conn.from, to: conn.to, labelText: conn.label });
       return;
