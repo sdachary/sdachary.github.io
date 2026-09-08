@@ -6,7 +6,7 @@ const tracks: WorkTrack[] = [
     role: 'Hire Me',
     subtitle: 'Senior Data Analyst',
     target: 'Employers',
-    desc: '9 years of analytics experience. Python, SQL, GCP, Power BI. Built pipelines processing 100K+ records daily. I lead teams, drive data culture, and ship decisions — not just dashboards.',
+    desc: '6+ years of analytics experience. Python, SQL, GCP, Power BI. Built pipelines processing 100K+ records daily. I lead teams, drive data culture, and ship decisions — not just dashboards.',
     cta: 'View Resume →',
     href: '#contact',
     accent: 'var(--accent)',

@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 
 const paragraphs = [
   <>Started as an <strong>HR professional</strong>. Pivoted hard into data. Taught myself Python at nights, SQL on weekends. Shipped my first analytics dashboard before anyone asked me to.</>,
-  <>Spent 9 years turning <strong>raw, messy data</strong> into decisions that moved businesses — from financial investment algorithms to retail sales intelligence. Building systems that scale.</>,
+  <>Now <strong>6+ years</strong> into turning raw, messy data into decisions that moved businesses — from financial investment algorithms to retail sales intelligence. Building systems that scale.</>,
   <>But the day job wasn't enough. So I built an <strong>entire ecosystem from scratch</strong> — AI agents, cloud provisioners, financial engines, compute marketplaces.</>,
   <>The mission: <strong>sovereign, India-resident infrastructure</strong>. No foreign dependencies. No vendor lock-in. Just systems that last.</>,
 ]
@@ -21,7 +21,7 @@ export default function About() {
           className="about-big-number"
           aria-hidden="true"
         >
-          9
+          6+
         </motion.div>
         <motion.div
           initial={{ opacity: 0 }}

@@ -5,13 +5,7 @@ const experience: Experience[] = [
     company: 'Lloyds Technology Centre',
     role: 'Senior Data Analyst',
     period: 'Dec 2023 — Present · Hyderabad',
-    desc: 'Building data management systems, dashboards, and statistical models for one of UK\'s largest financial institutions. Designed Python automation for candidate-job matching, drove enterprise Looker adoption, and built Tableau-to-Power BI migration tooling via REST APIs. Leading the re-imagining of 300-400 internal Tableau views on Microsoft Fabric (~1.7 GB dataset). Wrote SQL stored procedures in GCP BigQuery with row/column-level PII security for AI/Copilot-enabled dashboards. Enforced GDPR compliance while handling high-confidentiality human-capital data using local 7B LLMs via MCP. Delivers ~4,000 PDF reports monthly to external stakeholders. Leads Agile ceremonies, plans in Jira Align, documents in Confluence.',
-  },
-  {
-    company: 'Vagdevi IT Solutions',
-    role: 'Data Analyst',
-    period: 'May 2020 — Dec 2023 · 3.5 yrs',
-    desc: 'Cleaned, manipulated, and analyzed large structured datasets using Excel, SQL, and Python. Implemented a data management system that improved data quality and accessibility for business and client teams. Forecasted business trends by combining historical datasets with planned business-model changes. Mined and acquired data from primary and secondary sources, reorganizing it into machine- and people-readable formats. Trained and mentored junior data analysts on best practices and technical skills.',
+    desc: 'Built Python automation matching open job IDs to candidates (grade, top-3 skills, secondary-skill overlap) for People & Places onboarding. Drove enterprise Looker adoption via ServiceNow-to-Looker provisioning automation with AD-group role-based access. Designed Tableau metadata extraction tool feeding Power BI to auto-generate data models, cutting manual work during Tableau→Power BI/Looker migration. Owned Tableau decommission: Power Automate flows for workbook-owner outreach and SharePoint tracking. Leading re-imagining of 300-400 internal Tableau views as reusable Power BI templates on ~1.7 GB dataset migrating to Microsoft Fabric. Wrote SQL stored procedures in GCP BigQuery with row/column-level PII security for AI/Copilot-enabled dashboards. Enforced GDPR compliance on high-confidentiality HC/PII data using local 7B LLMs via MCP to eliminate data-leakage risk. Delivers ~4,000 PDF reports monthly to external stakeholders. Led Agile ceremonies, planned in Jira Align, documented in Confluence.',
   },
   {
     company: 'Wicked Ride Adventure Services',
