@@ -12,7 +12,7 @@ set -euo pipefail
 #   -> regenerate + report only; never touches git in the target repo.
 
 REPO_DIR="${REPO_DIR:-$HOME/portfolio}"
-REPO_URL="git@github.com:sdachary/portfolio.git"
+REPO_URL="git@github.com:sdachary/sdachary.github.io.git"
 
 PACA_URL="${PACA_URL:-http://localhost:80}"
 PROJECT_ID="4cf13185-b9fb-4b19-97d1-2ee2c7597a5b"
