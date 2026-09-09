@@ -1,6 +1,6 @@
 # Portfolio
 
-> Personal portfolio site — Vite + React, deployed to Cloudflare Pages.
+> Personal portfolio site — Vite + React, deployed to GitHub Pages (`sdachary.github.io`).
 
 ## Stack
 
@@ -9,7 +9,7 @@
 | Runtime | Node.js |
 | Framework | Vite + React + TypeScript |
 | Database | — |
-| Deploy | Cloudflare Pages |
+| Deploy | GitHub Pages (`.github/workflows/deploy.yml`, Actions build) |
 
 ## Quick Start
 
