@@ -32,6 +32,18 @@ const posts: BlogPost[] = [
     `,
   },
   {
+    slug: 'indra-open-source',
+    title: 'Indra Is Now an Open-Source n8n Template',
+    date: '2026-09-09',
+    tags: ['indra', 'n8n', 'open-source', 'infrastructure'],
+    body: `
+      <p>Indra — my n8n automation template — is now open source and self-serve. After the Render free tier deleted the instance (again), I stopped treating it as a one-off deploy and rebuilt the repo as a template anyone can fork and run in minutes.</p>
+      <p>The three artifacts that make it work: a Dockerfile pinned to <code>n8nio/n8n:2.38.4</code> with a healthcheck, a 13-line <code>render.yaml</code> with zero per-user values, and an interactive <code>setup.sh</code> that guides you through Supabase or Neon, validates every input, and generates a dashboard-ready env file.</p>
+      <p>Config lives in the Render dashboard, not GitHub — so the template carries no secrets by design. In the process I swept the entire git history clean with <code>git-filter-repo</code>: a leaked Supabase host, a GitHub PAT, internal IDs, and stale URLs are all gone. Continuous integration runs gitleaks + hadolint + config validation, and a nightly workflow auto-upgrades n8n behind a healthcheck gate.</p>
+      <p>The lesson: a free-tier instance you provision once is a liability. A template with CI, healthcheck-gated upgrades, and git-history hygiene is an asset that keeps regenerating.</p>
+    `,
+  },
+  {
     slug: 'darpan-scan-engine',
     title: 'Building Darpan: An AI Privacy Auditor',
     date: '2026-07-10',
