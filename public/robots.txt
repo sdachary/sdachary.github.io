@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://aham.pages.dev/sitemap.xml
+Sitemap: https://sdachary.github.io/sitemap.xml
