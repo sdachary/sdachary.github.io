@@ -33,7 +33,7 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.6, ease }}
           className="hero-tagline"
         >
-          Senior Data Analyst &nbsp;✦&nbsp; AI Architect &nbsp;✦&nbsp; Solopreneur Builder
+          Senior Data Analyst &nbsp;·&nbsp; AI Architect &nbsp;·&nbsp; Solopreneur
         </motion.p>
 
         <motion.div
