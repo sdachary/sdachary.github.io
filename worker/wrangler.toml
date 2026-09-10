@@ -2,6 +2,5 @@ name = "portfolio-contact"
 main = "src/index.ts"
 compatibility_date = "2025-04-01"
 
-kv_namespaces = [
-  { binding = "CONTACT_KV", id = "", preview_id = "" }
-]
+[vars]
+NOTION_DATABASE_ID = "paste-your-notion-database-id"

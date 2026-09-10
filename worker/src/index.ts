@@ -1,10 +1,13 @@
 export interface Env {
-  CONTACT_KV: KVNamespace
-  RESEND_API_KEY?: string
+  NOTION_TOKEN?: string
+  NOTION_DATABASE_ID?: string
 }
 
 const ALLOWED_ORIGINS = ['https://sdachary.github.io', 'http://localhost:5173', 'http://localhost:4173']
-const CORRECT_EMAIL = 'deepakachary246@gmail.com'
+
+const NAME_FIELD = 'Name'
+const EMAIL_FIELD = 'Email'
+const MESSAGE_FIELD = 'Message'
 
 function corsHeaders(origin: string): Record<string, string> {
   const allow = ALLOWED_ORIGINS.includes(origin) ? origin : 'https://sdachary.github.io'
@@ -13,6 +16,30 @@ function corsHeaders(origin: string): Record<string, string> {
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   }
+}
+
+async function appendToNotion(env: Env, name: string, email: string, message: string): Promise<{ ok: boolean; detail: string }> {
+  if (!env.NOTION_TOKEN || !env.NOTION_DATABASE_ID) {
+    return { ok: false, detail: 'worker not configured (NOTION_TOKEN / NOTION_DATABASE_ID missing)' }
+  }
+  const res = await fetch('https://api.notion.com/v1/pages', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${env.NOTION_TOKEN}`,
+      'Content-Type': 'application/json',
+      'Notion-Version': '2022-06-28',
+    },
+    body: JSON.stringify({
+      parent: { database_id: env.NOTION_DATABASE_ID },
+      properties: {
+        [NAME_FIELD]: { title: [{ text: { content: name } }] },
+        [EMAIL_FIELD]: { email },
+        [MESSAGE_FIELD]: { rich_text: [{ text: { content: message } }] },
+      },
+    }),
+  })
+  const detail = await res.text()
+  return { ok: res.ok, detail }
 }
 
 export default {
@@ -38,22 +65,12 @@ export default {
         })
       }
 
-      const entry = { name, email, message, timestamp: new Date().toISOString(), ip: request.headers.get('CF-Connecting-IP') || '' }
-      const key = `contact:${Date.now()}`
-      await env.CONTACT_KV.put(key, JSON.stringify(entry), { expirationTtl: 7776000 })
-
-      if (env.RESEND_API_KEY) {
-        const emailRes = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            from: 'Portfolio Contact <contact@sdachary.workers.dev>',
-            to: CORRECT_EMAIL,
-            subject: `Portfolio Contact: ${name}`,
-            text: `From: ${name} (${email})\n\n${message}`,
-          }),
+      const result = await appendToNotion(env, name, email, message)
+      if (!result.ok) {
+        console.error('Notion rejected:', result.detail)
+        return new Response(JSON.stringify({ error: 'Notion rejected the submission' }), {
+          status: 502, headers: { ...headers, 'Content-Type': 'application/json' },
         })
-        if (!emailRes.ok) console.error('Resend failed:', await emailRes.text())
       }
 
       return new Response(JSON.stringify({ ok: true }), {
