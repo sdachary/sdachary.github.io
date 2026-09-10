@@ -3,4 +3,4 @@ main = "src/index.ts"
 compatibility_date = "2025-04-01"
 
 [vars]
-NOTION_DATABASE_ID = "paste-your-notion-database-id"
+NOTION_DATABASE_ID = "3d758aefcf9d80928c90e2d4b9481c6b"
