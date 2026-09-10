@@ -3,4 +3,4 @@ main = "src/index.ts"
 compatibility_date = "2025-04-01"
 
 [vars]
-NOTION_DATABASE_ID = "3d758aef-cf9d-803a-9cfd-000bd3bbd2d1"
+NOTION_DATABASE_ID = "3d758aef-cf9d-8164-9d2c-e3519633dbc8"
