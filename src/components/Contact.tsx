@@ -8,6 +8,8 @@ const links = [
   { href: 'https://github.com/sdachary', label: 'GitHub' },
 ]
 
+const WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL
+
 const ease = [0.32, 0.72, 0, 1] as const
 
 export default function Contact() {
@@ -20,8 +22,9 @@ export default function Contact() {
     const form = e.currentTarget
     const data = new FormData(form)
     try {
+      if (!WEBHOOK_URL) { setStatus('error'); return }
       const body = Object.fromEntries(data.entries())
-      const res = await fetch('https://portfolio-contact.sdachary.workers.dev', {
+      const res = await fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
