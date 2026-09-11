@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<!--
+  ACHARYLAB STANDARD LEGAL PAGES — TERMS OF SERVICE
+  ONE self-configuring template for ALL apps. Per-app = edit CONFIG, nothing else.
+  Same conventions as privacy-policy.template.html. App-specific bits per app:
+  account creation, refunds, linkToPrivacy.
+  Keep byte-identical across apps except CONFIG.
+-->
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="t-title"></title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --bg:#0A0A0A; --fg:#FAFAFA; --muted:#1A1A1A; --muted-fg:#8b8475; --accent:#FF3D00; --accent-dim:rgba(255,61,0,0.12); --border:#262626; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: var(--bg); color: var(--fg); line-height: 1.7; min-height: 100vh; }
+    .container { max-width: 760px; margin: 0 auto; padding: 56px 24px; }
+    .brand { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; color: var(--fg); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
+    .brand::before { content: "◈"; color: var(--accent); }
+    .page-header h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.04em; line-height: 1.2; margin: 32px 0 8px; }
+    .last-updated { font-size: 13px; color: var(--muted-fg); margin-bottom: 24px; }
+    .section { margin-bottom: 32px; }
+    .section h2 { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; }
+    .section p, .section li { font-size: 14.5px; color: #c9c4b8; }
+    .section p { margin-bottom: 10px; }
+    .section ul { padding-left: 20px; margin-bottom: 10px; }
+    .section li { margin-bottom: 4px; }
+    .section.hidden { display: none; }
+    a { color: var(--accent); text-decoration: none; }
+    .notice { border: 1px solid var(--border); border-left: 3px solid var(--accent); background: var(--accent-dim); padding: 14px 16px; border-radius: 8px; font-size: 14px; margin-bottom: 24px; }
+    footer { border-top: 1px solid var(--border); margin-top: 48px; padding-top: 20px; font-size: 13px; color: var(--muted-fg); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    footer a { color: var(--muted-fg); text-decoration: underline; }
+    footer a:hover { color: var(--fg); }
+    @media (max-width: 640px) { .container { padding: 28px 16px; } .page-header h1 { font-size: 24px; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="brand" href="/" id="brand"></a>
+
+    <div class="page-header">
+      <h1 id="h1">Terms of Service</h1>
+      <div class="last-updated" id="updated"></div>
+    </div>
+
+    <div class="section">
+      <h2>1. Agreement</h2>
+      <p id="agree"></p>
+    </div>
+
+    <div class="section">
+      <h2>2. Using the Service</h2>
+      <ul id="use-terms"></ul>
+    </div>
+
+    <div class="section hidden" id="s-account">
+      <h2>3. Accounts</h2>
+      <p id="account"></p>
+    </div>
+
+    <div class="section">
+      <h2 id="h-property" style="display:inline-block"></h2>
+      <p id="ip"></p>
+    </div>
+
+    <div class="section hidden" id="s-pay">
+      <h2>Fees &amp; payments</h2>
+      <p id="pay"></p>
+    </div>
+
+    <div class="section hidden" id="s-refund">
+      <h2>Refunds</h2>
+      <p id="refund"></p>
+    </div>
+
+    <div class="section">
+      <h2>Availability &amp; disclaimers</h2>
+      <p id="available"></p>
+    </div>
+
+    <div class="section">
+      <h2>Limitation of liability</h2>
+      <p id="liability"></p>
+    </div>
+
+    <div class="section">
+      <h2>Termination</h2>
+      <p id="terminate"></p>
+    </div>
+
+    <div class="section hidden" id="s-govrn">
+      <h2>Governing law</h2>
+      <p id="govern"></p>
+    </div>
+
+    <div class="section">
+      <h2>Changes to these terms</h2>
+      <p id="changes"></p>
+    </div>
+
+    <div class="notice">
+      <strong>Grievance Officer</strong> — appointed under the DPDP Act 2023 (s.8(6)):
+      <strong id="go-name"></strong> · <a id="go-mail" href="mailto:"></a>.
+      For questions about these terms, contact <a id="ct" href="mailto:"></a>.
+    </div>
+
+    <footer>
+      <span id="f-name"></span>
+      <span><a href="/privacy">Privacy Policy</a></span>
+    </footer>
+  </div>
+
+<script>
+/* ══════════════ CONFIG — edit per app, nothing else ══════════════ */
+const CONFIG = {
+  name: "Deepak Achar — Portfolio",
+  lastUpdated: "September 11, 2026",
+  description: "The personal portfolio site of Deepak Achar: about, experience, projects, blog and contact information.",
+  agreement: "These Terms of Service (\"Terms\") govern your use of the {{NAME}} application (\"the Service\"), developed by Deepak Achar. By accessing or using the Service you agree to these Terms.",
+  hasAccounts: false,
+  accountNote: "You are responsible for keeping your login credentials confidential and for all activity under your account. You must provide accurate information.",
+  hasPayments: false,
+  payNote: "Fees, where applicable, are displayed before purchase and payable through the payment processor named on the billing screen.",
+  hasRefunds: false,
+  refundNote: "Refund requests are handled per applicable law and any policy shown at checkout.",
+  governingLaw: "These Terms are governed by the laws of India. Any disputes are subject to the jurisdiction of the courts at Bengaluru, Karnataka.",
+  ip: "The Service, its design, and all intellectual property belong to Deepak Achar. You may use the Service only as intended, and may not copy, resell or reverse-engineer it except as permitted by law.",
+  available: "The Service is provided \"as is\" and \"as available\". We may update, suspend or discontinue it for maintenance, security or legal reasons with reasonable notice where practical.",
+  liability: "To the maximum extent permitted by law, we are not liable for indirect, incidental or consequential damages arising from your use of the Service.",
+  terminate: "We may suspend or terminate your access if you violate these Terms, misuse the Service, or where required by law. You may stop using the Service at any time.",
+  changes: "We may revise these Terms. If we make material changes, we will notify you through the app or by email. Continued use after changes means you accept the revised Terms. The last-updated date above reflects the most recent change.",
+  grievanceOfficer: { name: "Deepak Achar", role: "Grievance Officer", email: "grievance@acharylab.app" },
+  contactEmail: "hello@acharylab.app"
+};
+/* ══════════════ END CONFIG — do not edit below ══════════════ */
+
+const $ = (id) => document.getElementById(id);
+const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+const cfg = CONFIG;
+const fill = (s) => s.replace(/\{\{NAME\}\}/g, cfg.name);
+
+document.title = cfg.name + " — Terms of Service";
+set("brand", cfg.name);
+set("updated", "Effective " + cfg.lastUpdated + ".");
+set("agree", fill(cfg.agreement));
+
+const allowed = [
+  { t: "You may use the Service only for lawful purposes and in accordance with these Terms." },
+  { t: "You agree not to attempt to disrupt, overload or gain unauthorised access to the Service or its data." },
+  { t: "You are responsible for any content you upload, post or transmit through the Service." }
+];
+const ul = document.createElement("ul");
+allowed.forEach(li => { const el = document.createElement("li"); el.textContent = li.t; ul.appendChild(el); });
+$("use-terms").replaceWith(ul);
+
+if (cfg.hasAccounts) { $("s-account").classList.remove("hidden"); set("account", cfg.accountNote); }
+if (cfg.hasPayments) { $("s-pay").classList.remove("hidden"); set("pay", cfg.payNote); }
+if (cfg.hasRefunds) { $("s-refund").classList.remove("hidden"); set("refund", cfg.refundNote); }
+if (cfg.governingLaw) { $("s-govrn").classList.remove("hidden"); set("govern", cfg.governingLaw); }
+
+set("ip", cfg.ip); set("available", cfg.available);
+set("liability", cfg.liability); set("terminate", cfg.terminate); set("changes", cfg.changes);
+set("f-name", cfg.name);
+set("go-name", cfg.grievanceOfficer.name);
+$("go-mail").textContent = cfg.grievanceOfficer.email; $("go-mail").href = "mailto:" + cfg.grievanceOfficer.email;
+$("ct").textContent = cfg.contactEmail; $("ct").href = "mailto:" + cfg.contactEmail;
+/* h2 numbered 3 (Accounts), 4 (Property) — renumber skipped since hidden sections use next-higher number */
+</script>
+</body>
+</html>

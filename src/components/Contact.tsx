@@ -6,6 +6,8 @@ const links = [
   { href: 'https://www.linkedin.com/in/sdeepakachary/', label: 'LinkedIn' },
   { href: 'https://x.com/sdeepakachary', label: 'Twitter/X' },
   { href: 'https://github.com/sdachary', label: 'GitHub' },
+  { href: '/privacy.html', label: 'Privacy Policy' },
+  { href: '/terms.html', label: 'Terms of Service' },
 ]
 
 const WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL

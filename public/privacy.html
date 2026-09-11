@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<!--
+  ACHARYLAB STANDARD LEGAL PAGES — PRIVACY POLICY (DPDP Act 2023)
+  ONE self-configuring template for ALL apps. Per-app = edit the CONFIG
+  object below, nothing else. Deploy the same file to each app's static
+  root (public/ or site root); the page renders itself from CONFIG.
+
+  Conventions:
+  - LAST_UPDATED = date THIS TEMPLATE TEXT changed, not app publish date.
+  - Grievance Officer block REQUIRED by DPDP Act s.8(6).
+  - noBackend apps (browser-only tools) set noBackend:true → §5 renders
+    the "data never leaves device" statement and hides third-party table.
+  - Keep byte-identical across apps except CONFIG so diffs stay reviewable.
+-->
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="t-title"></title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --bg:#0A0A0A; --fg:#FAFAFA; --muted:#1A1A1A; --muted-fg:#8b8475; --accent:#FF3D00; --accent-dim:rgba(255,61,0,0.12); --border:#262626; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: var(--bg); color: var(--fg); line-height: 1.7; min-height: 100vh; }
+    .container { max-width: 760px; margin: 0 auto; padding: 56px 24px; }
+    .brand { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; color: var(--fg); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
+    .brand::before { content: "◈"; color: var(--accent); }
+    .page-header h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.04em; line-height: 1.2; margin: 32px 0 8px; }
+    .last-updated { font-size: 13px; color: var(--muted-fg); margin-bottom: 24px; }
+    .section { margin-bottom: 32px; }
+    .section h2 { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; }
+    .section h3 { font-size: 15px; font-weight: 600; margin: 14px 0 6px; }
+    .section p, .section li { font-size: 14.5px; color: #c9c4b8; }
+    .section p { margin-bottom: 10px; }
+    .section ul { padding-left: 20px; margin-bottom: 10px; }
+    .section li { margin-bottom: 4px; }
+    .section.hidden { display: none; }
+    table { width: 100%; border-collapse: collapse; margin: 10px 0 16px; }
+    th, td { text-align: left; padding: 8px 12px; border: 1px solid var(--border); font-size: 13.5px; vertical-align: top; }
+    th { background: var(--muted); color: var(--fg); font-weight: 600; }
+    td { color: #c9c4b8; }
+    a { color: var(--accent); text-decoration: none; }
+    .notice { border: 1px solid var(--border); border-left: 3px solid var(--accent); background: var(--accent-dim); padding: 14px 16px; border-radius: 8px; font-size: 14px; margin-bottom: 24px; }
+    footer { border-top: 1px solid var(--border); margin-top: 48px; padding-top: 20px; font-size: 13px; color: var(--muted-fg); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    footer a { color: var(--muted-fg); text-decoration: underline; }
+    footer a:hover { color: var(--fg); }
+    @media (max-width: 640px) { .container { padding: 28px 16px; } .page-header h1 { font-size: 24px; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="brand" href="/" id="brand"></a>
+
+    <div class="page-header">
+      <h1 id="h1">Privacy Policy</h1>
+      <div class="last-updated" id="updated"></div>
+    </div>
+
+    <div class="notice hidden" id="notice">
+      <strong>Grievance Officer</strong> — appointed under the Digital Personal Data
+      Protection Act 2023 (s.8(6)): <strong id="go-name"></strong> (<span id="go-role"></span>).
+      Contact: <a id="go-mail" href="mailto:"></a>. We respond <strong>within 24 hours</strong>
+      and aim to resolve grievances <strong>within 7 business days</strong>.
+    </div>
+
+    <div class="section">
+      <h2>1. Who we are</h2>
+      <p id="who"></p>
+    </div>
+
+    <div class="section" id="s-about">
+      <h2>2. About this app</h2>
+      <p id="about"></p>
+    </div>
+
+    <div class="section">
+      <h2>3. Data we collect</h2>
+      <ul id="data-list"></ul>
+      <p id="data-extra"></p>
+    </div>
+
+    <div class="section">
+      <h2>4. How we use your data</h2>
+      <ul>
+        <li>To provide and operate the Service you requested;</li>
+        <li>To communicate with you about the Service (updates, security, support);</li>
+        <li>To prevent abuse, fraud or technical faults;</li>
+        <li>To comply with legal obligations.</li>
+      </ul>
+      <p id="use-note"></p>
+    </div>
+
+    <div class="section" id="s-storage">
+      <h2>5. Where your data is stored</h2>
+      <p id="storage"></p>
+    </div>
+
+    <div class="section hidden" id="s-third">
+      <h2>6. Sharing with third parties</h2>
+      <p id="third-note"></p>
+      <table><thead><tr><th>Provider</th><th>Purpose</th><th>Data shared</th></tr></thead>
+        <tbody id="third-body"></tbody>
+      </table>
+    </div>
+
+    <div class="section hidden" id="s-pay">
+      <h2>Payments</h2>
+      <p id="pay-note"></p>
+    </div>
+
+    <div class="section" id="s-rights">
+      <h2>7. Your rights under the DPDP Act</h2>
+      <p>As a Data Principal you have the right to:</p>
+      <ul>
+        <li><strong>Access</strong> — a summary of your personal data we hold (§11);</li>
+        <li><strong>Correction</strong> — correct or erase inaccurate data (§12);</li>
+        <li><strong>Erasure</strong> — request deletion of your data (§12);</li>
+        <li><strong>Grievance redressal</strong> — via our Grievance Officer, then the
+        Data Protection Board of India (§14).</li>
+      </ul>
+      <p id="rights-contact"></p>
+    </div>
+
+    <div class="section">
+      <h2>8. Consent &amp; withdrawal</h2>
+      <p id="consent"></p>
+    </div>
+
+    <div class="section">
+      <h2>9. Data security</h2>
+      <p id="security"></p>
+    </div>
+
+    <div class="section">
+      <h2>10. Children</h2>
+      <p id="children"></p>
+    </div>
+
+    <div class="section">
+      <h2>11. Changes to this policy</h2>
+      <p id="changes"></p>
+    </div>
+
+    <footer>
+      <span id="f-name"></span>
+      <span>Grievance Officer: <a id="f-go" href="mailto:"></a> · <a href="/terms">Terms of Service</a></span>
+    </footer>
+  </div>
+
+<script>
+/* ══════════════ CONFIG — edit per app, nothing else ══════════════ */
+const CONFIG = {
+  name: "Deepak Achar — Portfolio",
+  lastUpdated: "September 11, 2026",
+  description: "The personal portfolio site of Deepak Achar: about, experience, projects, blog and contact information.",
+  // noBackend: set TRUE for browser-only tools (no server, data never leaves device).
+  noBackend: false,
+  // dataCollected: list of {t: title, d: detail} shown as bullet items in §3.
+  dataCollected: [
+    { t: "Contact form", d: "name, email address and message you submit through the contact form" },
+    { t: "Usage data", d: "anonymous page-views served via Cloudflare (IP address and request metadata)" }
+  ],
+  storage: "Contact-form submissions are sent to an internal workflow inbox and kept only to reply to your message. Usage data stays within Cloudflare's edge logs.",
+  thirdParties: [
+    { name: "Cloudflare", purpose: "hosting, CDN, DNS, DDoS protection", data: "IP address and request metadata" },
+    { name: "n8n", purpose: "contact-form workflow automation (mail deliver)", data: "your name, email and message" }
+  ],
+  hasPayments: false,
+  payNote: "Payments are processed by Razorpay. We do not see or store your full payment card details.",
+  security: "We encrypt data in transit (TLS) and restrict access to contact submissions to the operator. In a personal data breach we notify the Data Protection Board and affected users as required by s.8(6).",
+  grievanceOfficer: { name: "Deepak Achar", role: "Grievance Officer", email: "grievance@acharylab.app" },
+  contactEmail: "hello@acharylab.app",
+  childAge: 18
+};
+/* ══════════════ END CONFIG — do not edit below ══════════════ */
+
+const $ = (id) => document.getElementById(id);
+const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+const cfg = CONFIG;
+
+document.title = cfg.name + " — Privacy Policy";
+set("t-title", cfg.name + " — Privacy Policy");
+set("brand", cfg.name);
+set("updated", "Platform-wide version effective " + cfg.lastUpdated + ". App-specific details vary by app and are listed below.");
+set("who", "This Policy describes how " + cfg.name + ' ("the Service"), developed by Deepak Achar ("we", "us", "our"), collects, processes and protects personal data in accordance with the <strong>Digital Personal Data Protection Act 2023</strong> (DPDP Act) and applicable Indian law.'.replace(/<[^>]+>/g, ""));
+set("about", cfg.description);
+set("storage", cfg.noBackend ? "Nothing is stored on a server. " + cfg.name + " runs entirely in your browser: all data stays on your device and never leaves it. There is no account, no upload and no cross-device sync." : cfg.storage);
+set("data-extra", cfg.noBackend ? "Because this app is browser-only, no personal data is collected or transmitted." : "We follow a data-minimisation principle: only the data each app needs to function is collected.");
+set("use-note", cfg.noBackend ? "" : "We do not sell or rent personal data. We do not use tracking cookies or third-party advertising.");
+$("s-storage").querySelector("h2").textContent = cfg.noBackend ? "5. Where your data lives" : "5. Where your data is stored";
+
+const dl = $("data-list");
+dl.innerHTML = "";
+(cfg.dataCollected.length ? cfg.dataCollected : [{ t: "No personal data", d: "this app is browser-only and collects nothing" }])
+  .forEach(x => { const li = document.createElement("li"); li.innerHTML = "<strong>" + x.t + "</strong> — " + x.d; dl.appendChild(li); });
+
+if (cfg.thirdParties && cfg.thirdParties.length) {
+  $("s-third").classList.remove("hidden");
+  $("third-note").textContent = "We share data only with providers strictly necessary to operate the Service:";
+  const tb = $("third-body"); tb.innerHTML = "";
+  cfg.thirdParties.forEach(t => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>" + t.name + "</td><td>" + t.purpose + "</td><td>" + t.data + "</td>";
+    tb.appendChild(tr);
+  });
+}
+if (cfg.hasPayments) { $("s-pay").classList.remove("hidden"); $("pay-note").textContent = cfg.payNote; }
+
+if (cfg.grievanceOfficer) {
+  $("notice").classList.remove("hidden");
+  set("go-name", cfg.grievanceOfficer.name);
+  set("go-role", cfg.grievanceOfficer.role);
+  $("go-mail").textContent = cfg.grievanceOfficer.email; $("go-mail").href = "mailto:" + cfg.grievanceOfficer.email;
+  $("f-go").textContent = cfg.grievanceOfficer.email; $("f-go").href = "mailto:" + cfg.grievanceOfficer.email;
+}
+set("rights-contact", "To exercise any right, write to " + cfg.contactEmail + ". We respond within 24 hours and complete lawful requests without undue delay.");
+set("consent", "We process personal data on the basis of your consent. You may withdraw consent at any time via the app or by writing to " + cfg.contactEmail + ". Withdrawal does not affect the lawfulness of processing before withdrawal.");
+set("security", cfg.security);
+set("children", "The Service is not directed at children under " + cfg.childAge + " and we do not knowingly collect their data. If you believe a child's data has been shared with us, contact the Grievance Officer and we will delete it.");
+set("changes", "We may update this Platform-wide policy. The last-updated date above reflects the most recent change. Material changes are communicated through the app or by email.");
+set("f-name", cfg.name);
+</script>
+</body>
+</html>
