@@ -210,6 +210,37 @@
           "color": "#94a3b8",
           "h": 0.6,
           "desc": "SSH brute force protection."
+        },
+        {
+          "id": "step-ca",
+          "name": "step-ca",
+          "type": "security",
+          "logo": "shield",
+          "color": "#16a34a",
+          "h": 1.2,
+          "desc": "Internal certificate authority. Issues TLS certs for Pi-hole and tailnet devices. Port 8443.",
+          "meta": {
+            "protocol": "HTTPS :8443",
+            "upstream": "self-signed root (internal)",
+            "dataStored": "CA private key + issued certs",
+            "pii": "No",
+            "topology": "oradev, internal-only"
+          }
+        },
+        {
+          "id": "coturn",
+          "name": "coturn",
+          "type": "network",
+          "logo": "",
+          "color": "#f97316",
+          "h": 1,
+          "desc": "WebRTC TURN relay for Sandesh transfers. UDP 3478 + relay range.",
+          "meta": {
+            "protocol": "UDP 3478 + 49152-65535",
+            "upstream": "prayog (Sandesh browser)",
+            "pii": "No — relay data not inspected",
+            "topology": "oradev, public UDP"
+          }
         }
       ]
     },
@@ -493,18 +524,28 @@
       "label": "DNS via Tailscale"
     },
     {
+      "from": "pihole",
+      "to": "step-ca",
+      "label": "HTTPS cert"
+    },
+    {
+      "from": "prayog",
+      "to": "coturn",
+      "label": "TURN relay"
+    },
+    {
       "from": "mcp-hub",
       "to": "notion",
       "label": "API"
     }
   ],
-  "generated_at": "2026-09-04T11:50:00.000Z",
+  "generated_at": "2026-09-12T08:00:00.000Z",
   "stats": {
-    "total_services": 32,
-    "online": 32,
+    "total_services": 34,
+    "online": 34,
     "zones": 5,
-    "connections": 20,
-    "total": 32
+    "connections": 22,
+    "total": 34
   },
   "health": {
     "nginx": {
@@ -578,6 +619,14 @@
     "fail2ban": {
       "online": true,
       "checked_at": "2026-09-04T07:26:57.775Z"
+    },
+    "step-ca": {
+      "online": true,
+      "checked_at": "2026-09-12T07:30:00.000Z"
+    },
+    "coturn": {
+      "online": true,
+      "checked_at": "2026-09-12T07:30:00.000Z"
     },
     "workstation": {
       "online": true,
