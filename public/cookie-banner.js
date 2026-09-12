@@ -36,20 +36,35 @@
   window.initCookieBanner = function (opts) {
     if (opts) { for (var k in opts) if (Object.prototype.hasOwnProperty.call(opts, k)) CONFIG[k] = opts[k]; }
     try {
-      if (localStorage.getItem('acharylab-cookie-consent')) return; // already decided
+      if (localStorage.getItem('acharylab-cookie-consent')) return; // already decided/dismissed
       var el = document.createElement('div');
       el.innerHTML = HTML;
-      document.body.appendChild(el.firstChild);
-      var accept = document.getElementById('acharylab-cookie-accept');
-      var reject = document.getElementById('acharylab-cookie-reject');
+      var banner = el.firstChild; // appendChild MOVES it out of el — never remove el
+      document.body.appendChild(banner);
+      var accept = banner.querySelector('#acharylab-cookie-accept');
+      var reject = banner.querySelector('#acharylab-cookie-reject');
+      var done = false;
+      var hide = function () {
+        if (done) return;
+        done = true;
+        banner.style.transition = 'opacity .3s';
+        banner.style.opacity = '0';
+        setTimeout(function () { banner.remove(); }, 320);
+      };
+      var onScroll = function () {
+        localStorage.setItem('acharylab-cookie-consent', 'dismissed'); // informational notice (DPDP): no consent needed for essential cookies
+        hide();
+      };
       if (accept) accept.addEventListener('click', function () {
         localStorage.setItem('acharylab-cookie-consent', CONFIG.REQUIRED ? 'v1' : 'granted');
-        el.remove();
+        hide();
       });
       if (reject) reject.addEventListener('click', function () {
         localStorage.setItem('acharylab-cookie-consent', 'reject');
-        el.remove();
+        hide();
       });
+      // Auto-hide on scroll for essential-only notices (no choice to record)
+      window.addEventListener('scroll', onScroll, { passive: true });
     } catch { /* storage unavailable; show nothing */ }
   };
 })();
