@@ -34,12 +34,6 @@ __pycache__/
 # AI tool cache
 .superpowers/
 
-# Build artifacts
-scan.log
-portfolio/.gitignore
-projects_snippet.html
-.shots/
-
 # wrangler files
 .wrangler
 .dev.vars*

@@ -24,19 +24,6 @@ export interface Project {
   github_remote?: string | null
 }
 
-export interface DualCardData {
-  eyebrow: string
-  title: string
-  items: string[]
-}
-
-export interface Service {
-  num: string
-  title: string
-  desc: string
-  audience: 'employer' | 'client' | 'both'
-}
-
 export interface WorkTrack {
   role: string
   subtitle: string
