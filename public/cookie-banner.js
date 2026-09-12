@@ -34,7 +34,7 @@
     '</div></div>';
 
   window.initCookieBanner = function (opts) {
-    if (opts) { for (var k in opts) if (opts.hasOwnProperty(k)) CONFIG[k] = opts[k]; }
+    if (opts) { for (var k in opts) if (Object.prototype.hasOwnProperty.call(opts, k)) CONFIG[k] = opts[k]; }
     try {
       if (localStorage.getItem('acharylab-cookie-consent')) return; // already decided
       var el = document.createElement('div');
@@ -50,6 +50,6 @@
         localStorage.setItem('acharylab-cookie-consent', 'reject');
         el.remove();
       });
-    } catch (e) { /* storage unavailable; show nothing */ }
+    } catch { /* storage unavailable; show nothing */ }
   };
 })();

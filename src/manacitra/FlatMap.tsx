@@ -5,20 +5,9 @@ import { logoFor } from './logos';
 import { hostingFor } from './hosting';
 import { TOKENS, TOKENS_HC } from './tokens';
 import { usePanZoom } from './controls/usePanZoom';
+import { layout, TILE, TILE_H, TILE_GAP, ROW_PITCH, HEADER, PAD } from './layout';
+import type { Tile, ZoneCard } from './layout';
 import type { ManacitraData, Zone } from './types';
-
-const TILE = 72;
-const TILE_GAP = 24;
-const ROW_PITCH = TILE + TILE_GAP;
-const PAD = 26;
-const HEADER = 58;
-const MARGIN = 48;
-const COL_GAP = 200;
-const ROW_GAP = 150;
-
-interface Rect { x: number; y: number; w: number; h: number }
-interface Tile extends Rect { id: string }
-interface ZoneCard extends Rect { zone: Zone; tiles: Tile[] }
 
 // --- Label collision avoidance ---
 const LABEL_FONT_SIZE = 9.5;
@@ -96,66 +85,6 @@ function resolveLabelOverlaps(labels: { id: string; x: number; y: number; w: num
     result.set(label.id, { x: bestX, y: bestY });
   }
   return result;
-}
-
-function gridFor(n: number) {
-  const cols = Math.min(4, Math.max(1, Math.ceil(Math.sqrt(n))));
-  return { cols, rows: Math.ceil(n / cols) };
-}
-
-function zoneSize(n: number) {
-  const { cols, rows } = gridFor(n);
-  // MIN_CARD_W keeps zone-name + right-aligned hosting tag from colliding on tiny zones
-  const w = Math.max(PAD * 2 + cols * (TILE + TILE_GAP) - TILE_GAP, 260);
-  const h = HEADER + PAD + rows * ROW_PITCH - TILE_GAP + PAD;
-  return { w, h };
-}
-
-function layout(data: ManacitraData): { cards: ZoneCard[]; W: number; H: number } {
-  const sized = data.zones.map(z => ({ zone: z, size: zoneSize(z.services.length) }));
-  const get = (id: string) => sized.find(s => s.zone.id === id)!;
-
-  const cloudflare = get('cloudflare');
-  const oradb = get('oradb');
-  const oradev = get('oradev');
-  const external = get('external');
-  const personal = get('personal');
-
-  // Three-column facade: EDGE tier top-left, oradb middle (traffic sink),
-  // oradev right (AI tier). Personal (home) sits below oradb in the middle
-  // column so its Tailscale/DNS edges to oradev flow rightward through the
-  // clear B→C corridor instead of a full-width lane that crossed oradb.
-  // External sits below oradev so MCP→Notion drops straight down the column.
-  const colB = Math.max(MARGIN + cloudflare.size.w, MARGIN + 316) + COL_GAP;
-  const colC = colB + oradb.size.w + COL_GAP;
-
-  const place = (entry: { zone: Zone; size: { w: number; h: number } }, x: number, y: number): ZoneCard => {
-    const { zone, size } = entry;
-    const { cols } = gridFor(zone.services.length);
-    const tiles: Tile[] = zone.services.map((svc, i) => ({
-      id: svc.id,
-      x: x + PAD + (i % cols) * (TILE + TILE_GAP),
-      y: y + HEADER + PAD + Math.floor(i / cols) * ROW_PITCH,
-      w: TILE,
-      h: TILE,
-    }));
-    return { zone, x, y, w: size.w, h: size.h, tiles };
-  };
-
-  const cards = [
-    place(cloudflare, MARGIN, MARGIN),
-    place(oradb, colB, MARGIN),
-    place(oradev, colC, MARGIN),
-    place(personal, colB, MARGIN + oradb.size.h + ROW_GAP),
-    place(external, colC, MARGIN + oradev.size.h + ROW_GAP),
-  ];
-
-  const W = colC + oradev.size.w + MARGIN;
-  const H = Math.max(
-    MARGIN + oradb.size.h + ROW_GAP + personal.size.h,
-    MARGIN + oradev.size.h + ROW_GAP + external.size.h,
-  ) + MARGIN;
-  return { cards, W, H };
 }
 
 function cardById(cards: ZoneCard[], id: string) {
@@ -434,7 +363,7 @@ function buildRoutes(data: ManacitraData, cards: ZoneCard[]) {
         : edgePoint(fromCard, 'l', 0.5);
       const laneX = (fromCard.x + toCard.x + toCard.w) / 2;
       if (dstT) {
-        const entry = { x: toCard.x + toCard.w, y: clamp(dstT.tile.y + TILE / 2, toCard.y + PAD + 4, toCard.y + toCard.h - PAD - 6) };
+        const entry = { x: toCard.x + toCard.w, y: clamp(dstT.tile.y + TILE_H / 2, toCard.y + PAD + 4, toCard.y + toCard.h - PAD - 6) };
         const gutterX = toCard.x + toCard.w - PAD / 2 - gutterOff(dstT.tile);
         const tx = nextDst(dstT.tile);
         const lane = claimH(gutterX, tx, nextDstLane(dstT.tile));
@@ -705,8 +634,15 @@ export default function FlatMap({ data }: { data: ManacitraData }) {
           <g key={card.zone.id} opacity={zoneDim ? 0.4 : 1} style={{ transition: 'opacity .2s' }}>
             <rect x={card.x} y={card.y} width={card.w} height={card.h} rx={16} fill={T.surface} stroke={T.lineStrong} strokeWidth={1.2}
               style={{ filter: 'drop-shadow(0 1px 3px rgba(28,28,26,0.05))' }} />
+            <path
+              d={`M${card.x + 16},${card.y} H${card.x + card.w - 16} Q${card.x + card.w},${card.y} ${card.x + card.w},${card.y + 16} V${card.y + HEADER} H${card.x} V${card.y + 16} Q${card.x},${card.y} ${card.x + 16},${card.y} Z`}
+              fill={tint} opacity={0.10}
+            />
+            <path
+              d={`M${card.x + 1},${card.y + 1} H${card.x + card.w - 1} V${card.y + HEADER - 1} H${card.x + 1} Z`}
+              fill="none" stroke={tint} strokeWidth={1} opacity={0.28}
+            />
             <rect x={card.x + 1} y={card.y + 1} width={6} height={card.h - 2} rx={3} fill={tint} opacity={0.85} />
-            <rect x={card.x + 1} y={card.y + 1} width={card.w - 2} height={HEADER - 1} rx={14} fill={tint} opacity={0.08} />
             {zhLogo && (
               <g transform={`translate(${card.x + PAD + 12}, ${card.y + 16})`} aria-hidden="true">
                 <LogoMark logoKey={card.zone.id} size={20} />
@@ -734,7 +670,7 @@ export default function FlatMap({ data }: { data: ManacitraData }) {
                 </>
               );
             })()}
-            <line x1={card.x + PAD} y1={card.y + HEADER} x2={card.x + card.w - PAD} y2={card.y + HEADER} stroke={tint} strokeWidth={1} opacity={0.3} />
+            <line x1={card.x + PAD} y1={card.y + HEADER} x2={card.x + card.w - PAD} y2={card.y + HEADER} stroke={tint} strokeWidth={1} opacity={0.45} />
 
             {visibleLayers.services && card.tiles.map((tile, tileIdx) => {
               const svc = card.zone.services.find(s => s.id === tile.id)!;
@@ -779,12 +715,20 @@ export default function FlatMap({ data }: { data: ManacitraData }) {
                     <LogoMark logoKey={svc.logo} size={26} />
                   </g>
                   <text
-                    x={tile.x + tile.w / 2} y={logoFor(svc.logo) ? tile.y + tile.h - 10 : tile.y + tile.h / 2}
+                    x={tile.x + tile.w / 2} y={logoFor(svc.logo) ? tile.y + 56 : tile.y + 40}
                     fontFamily={T.fontSans} fontSize={logoFor(svc.logo) ? 10 : 11} fontWeight={600} fill={T.ink}
                     textAnchor="middle"
                     style={{ pointerEvents: 'none' }}
                   >
                     {svc.name}
+                  </text>
+                  <text
+                    x={tile.x + tile.w / 2} y={logoFor(svc.logo) ? tile.y + 71 : tile.y + 55}
+                    fontFamily={T.fontMono} fontSize={7} fontWeight={500} letterSpacing={1.6}
+                    fill={T.inkMuted} textAnchor="middle" opacity={0.75}
+                    style={{ pointerEvents: 'none' }}
+                  >
+                    {svc.type.toUpperCase()}
                   </text>
                   {visibleLayers.labels && (
                     <>
