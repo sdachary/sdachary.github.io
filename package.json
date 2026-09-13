@@ -9,12 +9,10 @@
     "build": "vite build",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "preview": "npm run build && wrangler dev",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint:manacitra": "node scripts/lint-manacitra.cjs",
-    "verify": "npm run lint && npm run typecheck && npm run lint:manacitra && npm run test",
-    "deploy": "npm run build && wrangler deploy"
+    "verify": "npm run lint && npm run typecheck && npm run lint:manacitra && npm run test"
   },
   "dependencies": {
     "@xyflow/react": "^12.11.2",
@@ -41,7 +39,6 @@
     "simple-icons": "^16.29.0",
     "typescript": "^6.0.3",
     "vite": "^8.0.12",
-    "vitest": "^4.1.9",
-    "wrangler": "^4.131.0"
+    "vitest": "^4.1.9"
   }
 }

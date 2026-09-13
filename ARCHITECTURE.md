@@ -2,7 +2,7 @@
 
 ## Key Decisions
 - Vite + React + TypeScript for fast dev experience; single build produces three pages (`index`, `manacitra`, `floweditor`) via Vite multi-page input.
-- Static site hosted on GitHub Pages (`sdachary.github.io`) via Actions build (`deploy.yml`). A Cloudflare Pages path also exists (`npm run deploy` — vite build + `wrangler deploy`) but GitHub Pages is the canonical host.
+- Static site hosted on GitHub Pages (`sdachary.github.io`) via Actions build (`deploy.yml`).
 - Mānacitra is a standalone page embedded on the homepage as an iframe; the flow editor is admin-only and never publicly linked.
 - Contact form POSTs to the `portfolio-contact` Cloudflare Worker (`https://portfolio-contact.sdachary-582.workers.dev`), which appends submissions to the Notion "Contact Submissions" DB (`3d758aef-cf9d-8164-9d2c-e3519633dbc8`). The earlier n8n webhook path (`VITE_N8N_WEBHOOK_URL`) was removed — no n8n instance runs.
 
@@ -21,7 +21,7 @@ contact form → portfolio-contact CF Worker → Notion "Contact submissions" DB
 
 ## Integration Points
 - GitHub Pages — hosting; deploy from `.github/workflows/deploy.yml` (build + upload-pages-artifact + deploy-pages); CI from `ci.yml`.
-- Cloudflare — optional Pages deploy via `npm run deploy` (`wrangler.jsonc` assets); legacy `worker/` (portfolio-contact, Notion writer) retained for reference.
+- Cloudflare — the `portfolio-contact` Worker (contact form → Notion). Site hosting is GitHub Pages only.
 - n8n (Render) — contact webhook → Notion submissions DB.
 - Plausible — cookieless analytics (`script.outbound-links.js` in `index.html`).
 - oradev (systemd timers) — `portfolio-sync.timer` runs `scripts/sync-activity.sh` daily (sources Recent Activity from the Paca API "Done" column, not public GitHub events); `manacitra-sync.timer` runs `scripts/sync-manacitra.sh` weekly (pulls repo, regenerates `public/manacitra/data.json` from live zone/service probing).

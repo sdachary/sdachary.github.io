@@ -43,8 +43,6 @@ npm run dev
 | `npm run lint:manacitra` | Validate `public/manacitra/data.json` shape |
 | `npm test` | Run tests (vitest) |
 | `npm run verify` | lint + typecheck + lint:manacitra + test |
-| `npm run preview` | Build + `wrangler dev` preview |
-| `npm run deploy` | Build + `wrangler deploy` (Cloudflare Pages path) |
 
 ## Env Vars
 
