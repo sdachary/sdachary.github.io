@@ -10,7 +10,7 @@ const links = [
   { href: '/terms.html', label: 'Terms of Service' },
 ]
 
-const WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL
+const CONTACT_ENDPOINT = 'https://portfolio-contact.sdachary-582.workers.dev'
 
 const ease = [0.32, 0.72, 0, 1] as const
 
@@ -24,9 +24,8 @@ export default function Contact() {
     const form = e.currentTarget
     const data = new FormData(form)
     try {
-      if (!WEBHOOK_URL) { setStatus('error'); return }
       const body = Object.fromEntries(data.entries())
-      const res = await fetch(WEBHOOK_URL, {
+      const res = await fetch(CONTACT_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

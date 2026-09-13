@@ -20,7 +20,7 @@ Cookie banner (`public/cookie-banner.js`): informational essential-only notice (
 |-------|-----------|
 | Runtime | Node.js |
 | Framework | Vite + React + TypeScript |
-| Database | Notion (contact submissions, via n8n webhook) |
+| Database | Notion (contact submissions via `portfolio-contact` CF Worker) |
 | Analytics | Plausible (cookieless) |
 | Deploy | GitHub Pages (`.github/workflows/deploy.yml`, Actions build) |
 
@@ -48,7 +48,7 @@ npm run dev
 
 ## Env Vars
 
-- `VITE_N8N_WEBHOOK_URL` — n8n webhook the contact form POSTs to. Injected at build time in GitHub Actions from the `N8N_WEBHOOK_URL` secret (never committed). See `.env.example` for details.
+None required for contact — the form posts to the hardcoded `portfolio-contact` Worker endpoint (CORS allows the GitHub Pages origin). Worker's `NOTION_TOKEN` is a Wrangler secret, not a repo value.
 
 ## License
 
