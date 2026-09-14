@@ -6,43 +6,59 @@
 
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import * as si from 'simple-icons';
+import {
+  siCloudflare,
+  siCloudflareworkers,
+  siGithub,
+  siGooglecloud,
+  siGrafana,
+  siHono,
+  siHtml5,
+  siJavascript,
+  siMinio,
+  siNestjs,
+  siNextdotjs,
+  siNginx,
+  siNvidia,
+  siPihole,
+  siPostgresql,
+  siReact,
+  siRedis,
+  siRubyonrails,
+  siSentry,
+  siTailscale,
+  siUptimekuma,
+  siVite,
+} from 'simple-icons';
 
-const KEY_TO_EXPORT = {
-  cloudflare: 'siCloudflare',
-  cloudflareworkers: 'siCloudflareworkers',
-  github: 'siGithub',
-  googlecloud: 'siGooglecloud',
-  grafana: 'siGrafana',
-  hono: 'siHono',
-  html5: 'siHtml5',
-  javascript: 'siJavascript',
-  minio: 'siMinio',
-  nestjs: 'siNestjs',
-  nextdotjs: 'siNextdotjs',
-  nginx: 'siNginx',
-  nvidia: 'siNvidia',
-  pihole: 'siPihole',
-  postgresql: 'siPostgresql',
-  rails: 'siRubyonrails',
-  react: 'siReact',
-  redis: 'siRedis',
-  sentry: 'siSentry',
-  tailscale: 'siTailscale',
-  uptimekuma: 'siUptimekuma',
-  vite: 'siVite',
+const KEY_TO_ICON = {
+  cloudflare: siCloudflare,
+  cloudflareworkers: siCloudflareworkers,
+  github: siGithub,
+  googlecloud: siGooglecloud,
+  grafana: siGrafana,
+  hono: siHono,
+  html5: siHtml5,
+  javascript: siJavascript,
+  minio: siMinio,
+  nestjs: siNestjs,
+  nextdotjs: siNextdotjs,
+  nginx: siNginx,
+  nvidia: siNvidia,
+  pihole: siPihole,
+  postgresql: siPostgresql,
+  rails: siRubyonrails,
+  react: siReact,
+  redis: siRedis,
+  sentry: siSentry,
+  tailscale: siTailscale,
+  uptimekuma: siUptimekuma,
+  vite: siVite,
 };
 
-const missing = Object.values(KEY_TO_EXPORT).filter((name) => !(name in si));
-if (missing.length) {
-  console.error(`generate-logos: missing simple-icons exports: ${missing.join(', ')}`);
-  process.exit(1);
-}
-
-const entries = Object.entries(KEY_TO_EXPORT)
+const entries = Object.entries(KEY_TO_ICON)
   .sort(([a], [b]) => a.localeCompare(b))
-  .map(([key, exportName]) => {
-    const icon = si[exportName];
+  .map(([key, icon]) => {
     return `  ${key}: { color: '#${icon.hex}', vb: '0 0 24 24', d: '${icon.path}' },`;
   })
   .join('\n');
@@ -56,7 +72,7 @@ ${entries}
 };
 
 // only official brand logos are rendered; services without one are text-only
-// tiles (no invented glyphs). Add KEY_TO_EXPORT entries to the generator, then
+// tiles (no invented glyphs). Add KEY_TO_ICON entries to the generator, then
 // re-run: node scripts/generate-logos.mjs
 export function logoFor(key: string): LogoDef | null {
   return BRAND[key] ?? null;

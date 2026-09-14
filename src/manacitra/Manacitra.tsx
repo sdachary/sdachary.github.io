@@ -159,10 +159,10 @@ function Header({ online, offline, unchecked, total }: { online: number; offline
 
 export default function Manacitra() {
   const [loaded, setLoaded] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(5);
   const [status, setStatus] = useState('Loading data...');
   const [error, setError] = useState<string | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 640px)').matches);
   const [toolsOpen, setToolsOpen] = useState(false);
   const data = useManacitraStore(s => s.data);
   const setData = useManacitraStore(s => s.setData);
@@ -172,7 +172,6 @@ export default function Manacitra() {
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 640px)');
-    setIsMobile(mq.matches);
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
@@ -187,7 +186,7 @@ export default function Manacitra() {
       t++;
       const h = data.health[id];
       if (!h) return;
-      h.online ? on++ : off++;
+      if (h.online) on++; else off++;
     });
     return { online: on, offline: off, total: t };
   }, [data]);
@@ -195,7 +194,6 @@ export default function Manacitra() {
   const unchecked = Math.max(0, total - online - offline);
 
   useEffect(() => {
-    setProgress(5);
     fetch('/manacitra/data.json')
       .then(r => r.json())
       .then((d: ManacitraData) => {

@@ -13,24 +13,42 @@ const links = [
 ]
 
 function useTheme() {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window === 'undefined') return 'dark'
+    const stored = localStorage.getItem('theme') as 'dark' | 'light' | null
+    if (stored === 'light' || stored === 'dark') return stored
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+  })
 
   useEffect(() => {
-    const stored = localStorage.getItem('theme') as 'dark' | 'light' | null
-    const preferred = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
-    const initial = stored || preferred
-    setTheme(initial)
-    document.documentElement.setAttribute('data-theme', initial)
-  }, [])
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
 
   const toggle = () => {
     const next = theme === 'dark' ? 'light' : 'dark'
     setTheme(next)
-    document.documentElement.setAttribute('data-theme', next)
     localStorage.setItem('theme', next)
   }
 
   return { theme, toggle }
+}
+
+function NavLinkList({ activeSection, onNavigate, itemClass }: { activeSection: string; onNavigate: () => void; itemClass: string }) {
+  return (
+    <ul className={itemClass}>
+      {links.map(l => (
+        <li key={l.href}>
+          <a
+            href={l.href}
+            className={`navbar-link${activeSection === l.href.slice(1) ? ' active' : ''}`}
+            onClick={onNavigate}
+          >
+            {l.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
 }
 
 function SectionObserver({ onActive }: { onActive: (id: string) => void }) {
@@ -113,19 +131,7 @@ export default function Navbar() {
             <nav className="navbar" ref={navRef} aria-label="Main navigation">
               <div className="navbar-brand">SDA</div>
               <div className="nav-group">
-                <ul className="navbar-links">
-                  {links.map(l => (
-                    <li key={l.href}>
-                      <a
-                        href={l.href}
-                        className={`navbar-link${activeSection === l.href.slice(1) ? ' active' : ''}`}
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        {l.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+                <NavLinkList activeSection={activeSection} onNavigate={() => setMobileOpen(false)} itemClass="navbar-links" />
                 <div className="nav-divider" />
                 <button
                   onClick={toggle}
@@ -157,19 +163,7 @@ export default function Navbar() {
                   transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
                   className="nav-mobile"
                 >
-                  <ul className="nav-mobile-links">
-                    {links.map(l => (
-                      <li key={l.href}>
-                        <a
-                          href={l.href}
-                          className={`navbar-link${activeSection === l.href.slice(1) ? ' active' : ''}`}
-                          onClick={() => setMobileOpen(false)}
-                        >
-                          {l.label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
+                  <NavLinkList activeSection={activeSection} onNavigate={() => setMobileOpen(false)} itemClass="nav-mobile-links" />
                 </motion.div>
               )}
             </AnimatePresence>

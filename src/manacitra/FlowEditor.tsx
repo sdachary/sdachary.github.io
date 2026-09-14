@@ -61,14 +61,17 @@ function ServiceNode({ data }: { data: ServiceNodeData }) {
   const { service } = data;
   const def = logoFor(service.logo);
   const hasLogo = !!def;
+  const interactive = !!service.url;
+  const openUrl = () => window.open(service.url!, '_blank', 'noopener');
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openUrl(); }
+  };
+  const tileProps = interactive
+    ? { role: 'link' as const, tabIndex: 0, onClick: openUrl, onKeyDown }
+    : {};
 
   return (
-    <div
-      role={service.url ? 'link' : undefined}
-      tabIndex={service.url ? 0 : undefined}
-      onClick={() => { if (service.url) window.open(service.url, '_blank', 'noopener'); }}
-      onKeyDown={e => { if (service.url && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); window.open(service.url, '_blank', 'noopener'); } }}
-      style={{
+    <div {...tileProps} style={{
         width: TILE_W,
         height: TILE_H,
         borderRadius: 12,
@@ -278,7 +281,7 @@ export default function FlowEditor({ data, onSaveLayout }: { data: ManacitraData
   const highContrast = useManacitraStore(s => s.highContrast);
   const T = highContrast ? TOKENS_HC : TOKENS;
   const saveCallback = useRef(onSaveLayout);
-  saveCallback.current = onSaveLayout;
+  useEffect(() => { saveCallback.current = onSaveLayout; }, [onSaveLayout]);
 
   const onConnect = useCallback((params: Connection) => {
     setEdges(eds => addEdge({ ...params, type: 'smoothstep', animated: true, markerEnd: { type: MarkerType.ArrowClosed } }, eds));

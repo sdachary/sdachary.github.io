@@ -1,9 +1,9 @@
-export interface HealthEntry {
+interface HealthEntry {
   online: boolean;
   checked_at: string;
 }
 
-export interface ServiceMeta {
+interface ServiceMeta {
   protocol?: string;
   upstream?: string;
   dataStored?: string;
@@ -35,7 +35,7 @@ export interface Zone {
   services: Service[];
 }
 
-export interface Connection {
+interface Connection {
   from: string;
   to: string;
   label: string;

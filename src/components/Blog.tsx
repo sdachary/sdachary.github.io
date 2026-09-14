@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { motion, type Variants } from 'framer-motion'
 import posts from '../data/blog'
+import SanitizedHtml from './SanitizedHtml'
 
 const ease = [0.32, 0.72, 0, 1] as const
 
@@ -92,7 +93,7 @@ export default function Blog() {
             <h3 className="blog-title">
               <a id={post.slug} href={`#${post.slug}`} className="blog-title-link">{post.title}</a>
             </h3>
-            <div className="blog-body" dangerouslySetInnerHTML={{ __html: post.body }} />
+            <div className="blog-body"><SanitizedHtml html={post.body} /></div>
           </motion.article>
         ))}
       </motion.div>

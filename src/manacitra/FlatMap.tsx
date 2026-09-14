@@ -9,7 +9,7 @@ import { layout, TILE, TILE_H, TILE_GAP, ROW_PITCH, HEADER, PAD } from './layout
 import type { Tile, ZoneCard } from './layout';
 import type { ManacitraData, Zone } from './types';
 
-// --- Label collision avoidance ---
+// Service labels are nudged off overlapping tiles and routes.
 const LABEL_FONT_SIZE = 9.5;
 const LABEL_PAD_X = 4;
 const LABEL_PAD_Y = 2;
@@ -66,10 +66,7 @@ function resolveLabelOverlaps(labels: { id: string; x: number; y: number; w: num
           const cx = label.x + dx;
           const cy = label.y + dy;
           const box = { x: cx - label.w / 2, y: cy - h / 2, w: label.w, h };
-          const overlaps = placed.some(p =>
-            box.x < p.x + p.w && box.x + box.w > p.x &&
-            box.y < p.y + p.h && box.y + box.h > p.y
-          );
+          const overlaps = placed.some(p => rectsOverlap(box, p));
           if (!overlaps) {
             bestX = cx;
             bestY = cy;
@@ -93,6 +90,10 @@ function cardById(cards: ZoneCard[], id: string) {
 
 function clamp(v: number, lo: number, hi: number) {
   return Math.max(lo, Math.min(hi, v));
+}
+
+function rectsOverlap(a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }) {
+  return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 }
 
 // point on a card edge (face: l/r/t/b), t in 0..1 along that edge
@@ -446,6 +447,7 @@ function LogoMark({ logoKey, size }: { logoKey: string; size: number }) {
 
 export default function FlatMap({ data }: { data: ManacitraData }) {
   const pz = usePanZoom();
+  const { ref: mapRef, pointerHandlers, style: viewStyle, isMoved, reset: resetView } = pz;
   const { cards, W, H } = useMemo(() => layout(data), [data]);
 
   const hoveredId = useManacitraStore(s => s.hoveredId);
@@ -566,7 +568,6 @@ export default function FlatMap({ data }: { data: ManacitraData }) {
     if (focusId && dimmed.has(focusId)) setFocusId(null);
   }, [focusId, dimmed, setFocusId]);
 
-  const resetView = pz.reset;
   useEffect(() => { resetView(); }, [resetToken, resetView]);
 
   const linkActive = (from: string, to: string) => {
@@ -576,19 +577,19 @@ export default function FlatMap({ data }: { data: ManacitraData }) {
 
   return (
     <svg
-      ref={pz.ref}
+      ref={mapRef}
       className="mc-map"
       tabIndex={0}
-      role="group"
+      role="grid"
       aria-label="AchayLab infrastructure map. Use arrow keys to move between services, Enter to open, Escape to clear. Pinch, scroll, or drag to zoom."
       onKeyDown={onKeyDown}
-      onBlur={() => { if (!pz.ref.current?.contains(document.activeElement)) { setFocusId(null); setHovered(null); } }}
-      onClick={e => { if (e.target === pz.ref.current) { setSelected(null); setFocusId(null); } }}
-      onClickCapture={e => { if (pz.isMoved()) { e.preventDefault(); e.stopPropagation(); } }}
-      {...pz.pointerHandlers}
+      onBlur={() => { if (!mapRef.current?.contains(document.activeElement)) { setFocusId(null); setHovered(null); } }}
+      onClick={e => { if (e.target === mapRef.current) { setSelected(null); setFocusId(null); } }}
+      onClickCapture={e => { if (isMoved()) { e.preventDefault(); e.stopPropagation(); } }}
+      {...pointerHandlers}
       viewBox={`0 0 ${W} ${H}`}
       preserveAspectRatio="xMidYMid meet"
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: T.bgCanvas, touchAction: 'none', transform: pz.style.transform, transformOrigin: pz.style.transformOrigin }}
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: T.bgCanvas, touchAction: 'none', transform: viewStyle.transform, transformOrigin: viewStyle.transformOrigin }}
     >
       <defs>
         <filter id="halo" x="-40%" y="-40%" width="180%" height="180%">

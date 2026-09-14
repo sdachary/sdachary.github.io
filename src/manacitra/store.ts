@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { ManacitraData } from './types';
 
-export interface Filters {
+interface Filters {
   status: ('online' | 'offline')[];
   type: string[];
 }

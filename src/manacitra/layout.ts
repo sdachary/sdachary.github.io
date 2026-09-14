@@ -6,11 +6,11 @@ export const TILE_GAP = 24;
 export const ROW_PITCH = TILE_H + TILE_GAP;
 export const PAD = 26;
 export const HEADER = 58;
-export const MARGIN = 48;
-export const COL_GAP = 200;
-export const ROW_GAP = 150;
+const MARGIN = 48;
+const COL_GAP = 200;
+const ROW_GAP = 150;
 
-export interface Rect { x: number; y: number; w: number; h: number }
+interface Rect { x: number; y: number; w: number; h: number }
 export interface Tile extends Rect { id: string }
 export interface ZoneCard extends Rect { zone: Zone; tiles: Tile[] }
 

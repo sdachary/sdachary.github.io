@@ -120,7 +120,7 @@ export function usePanZoom() {
       setView(v => clampBounds(v.scale, drag.current!.tx0 + dx, drag.current!.ty0 + dy));
     }
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  }, [view, rect, clampBounds]);
+  }, [view, clampBounds]);
 
   const onPointerEnd = useCallback((e: React.PointerEvent) => {
     pointers.current.delete(e.pointerId);

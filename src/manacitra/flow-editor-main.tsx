@@ -9,11 +9,10 @@ function FlowEditorPage() {
   const setData = useManacitraStore(s => s.setData);
 
   const [loaded, setLoaded] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(5);
   const [status, setStatus] = useState('Loading data...');
 
   useEffect(() => {
-    setProgress(5);
     fetch('/manacitra/data.json')
       .then(r => r.json())
       .then((d: ManacitraData) => {

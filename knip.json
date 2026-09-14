@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/main.tsx",
+    "src/manacitra/main.tsx",
+    "src/manacitra/flow-editor-main.tsx",
+    "scripts/generate-logos.mjs",
+    "worker/src/index.ts"
+  ],
+  "project": ["src/**/*.{ts,tsx}", "worker/**/*.{ts,js}", "scripts/**/*.{mjs,cjs,js}"]
+}

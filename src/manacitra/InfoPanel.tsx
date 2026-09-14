@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useManacitraStore } from './store';
 import { hostingFor } from './hosting';
-import { useMemo } from 'react';
 import { EASE, DURATION } from './motion/constants';
 
 function StatusDot({ online }: { online: boolean | null }) {
@@ -24,7 +23,7 @@ export default function InfoPanel() {
 
   const activeId = hoveredId ?? selectedId;
 
-  const info = useMemo(() => {
+  const info = (() => {
     if (!data || !activeId) return null;
     for (const zone of data.zones) {
       for (const svc of zone.services) {
@@ -44,7 +43,7 @@ export default function InfoPanel() {
       }
     }
     return null;
-  }, [data, activeId]);
+  })();
 
   const isHover = hoveredId !== null && hoveredId === activeId;
   const close = () => setSelected(null);
