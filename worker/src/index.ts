@@ -9,8 +9,10 @@ const NAME_FIELD = 'Name'
 const EMAIL_FIELD = 'Email'
 const MESSAGE_FIELD = 'Message'
 
+const NOTION_API_URL = 'https://api.notion.com/v1/pages'
+
 function corsHeaders(origin: string): Record<string, string> {
-  const allow = ALLOWED_ORIGINS.includes(origin) ? origin : 'https://sdachary.github.io'
+  const allow = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
   return {
     'Access-Control-Allow-Origin': allow,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -22,7 +24,7 @@ async function appendToNotion(env: Env, name: string, email: string, message: st
   if (!env.NOTION_TOKEN || !env.NOTION_DATABASE_ID) {
     return { ok: false, detail: 'worker not configured (NOTION_TOKEN / NOTION_DATABASE_ID missing)' }
   }
-  const res = await fetch('https://api.notion.com/v1/pages', {
+  const res = await fetch(NOTION_API_URL, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${env.NOTION_TOKEN}`,

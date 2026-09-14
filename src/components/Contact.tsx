@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { CONFIG } from '../config'
 
 const links = [
   { href: 'mailto:deepakachary246@gmail.com', label: 'deepakachary246@gmail.com' },
@@ -9,8 +10,6 @@ const links = [
   { href: '/privacy.html', label: 'Privacy Policy' },
   { href: '/terms.html', label: 'Terms of Service' },
 ]
-
-const CONTACT_ENDPOINT = 'https://portfolio-contact.sdachary-582.workers.dev'
 
 const ease = [0.32, 0.72, 0, 1] as const
 
@@ -25,7 +24,7 @@ export default function Contact() {
     const data = new FormData(form)
     try {
       const body = Object.fromEntries(data.entries())
-      const res = await fetch(CONTACT_ENDPOINT, {
+      const res = await fetch(CONFIG.contactEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

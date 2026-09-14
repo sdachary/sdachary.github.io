@@ -43,7 +43,14 @@ interface ManacitraStore {
 }
 
 const ls = <T,>(key: string, fallback: T): T => {
-  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : fallback; } catch { return fallback; }
+  try {
+    const v = localStorage.getItem(key)
+    if (v === null) return fallback
+    return JSON.parse(v)
+  } catch (err) {
+    console.warn(`manacitra: ignoring corrupt stored value for "${key}"`, err)
+    return fallback
+  }
 };
 
 export const useManacitraStore = create<ManacitraStore>((set, get) => ({
