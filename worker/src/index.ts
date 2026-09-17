@@ -59,7 +59,15 @@ export default {
 
     try {
       const body: Record<string, unknown> = await request.json()
-      const { name, email, message } = body as { name?: string; email?: string; message?: string }
+      const { name, email, message, website } = body as { name?: string; email?: string; message?: string; website?: string }
+
+      // Honeypot: a real user never fills the hidden "website" field. Silently
+      // accept so bots see success, but never write to Notion.
+      if (typeof website === 'string' && website.length > 0) {
+        return new Response(JSON.stringify({ ok: true }), {
+          status: 200, headers: { ...headers, 'Content-Type': 'application/json' },
+        })
+      }
 
       if (!name || !email || !message) {
         return new Response(JSON.stringify({ error: 'name, email, and message are required' }), {

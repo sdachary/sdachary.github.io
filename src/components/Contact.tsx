@@ -22,6 +22,12 @@ export default function Contact() {
     setStatus('sending')
     const form = e.currentTarget
     const data = new FormData(form)
+    // Honeypot: bots fill the hidden #website field — fake success, skip the request.
+    if (String(data.get('website') ?? '').length > 0) {
+      setStatus('success')
+      form.reset()
+      return
+    }
     try {
       const body = Object.fromEntries(data.entries())
       const res = await fetch(CONFIG.contactEndpoint, {
@@ -85,6 +91,14 @@ export default function Contact() {
           >
             <div className="contact-form-label">Send a message</div>
             <div className="contact-form-fields">
+              <input
+                type="text"
+                name="website"
+                autoComplete="off"
+                tabIndex={-1}
+                aria-hidden="true"
+                style={{ position: 'absolute', left: -9999, width: 1, height: 1, opacity: 0 }}
+              />
               <input name="name" placeholder="Your Name" aria-label="Your Name" required className="contact-input" />
               <input name="email" type="email" placeholder="Your Email" aria-label="Your Email" required className="contact-input" />
               <textarea name="message" placeholder="Tell me about your project..." aria-label="Your Message" required rows={4} className="contact-input" style={{ resize: 'vertical', minHeight: 100 }} />
