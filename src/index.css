@@ -17,6 +17,8 @@
   --card-bg2: rgba(245,240,232,0.012);
   --card-hover-bg: rgba(201,169,110,0.012);
   --card-shadow: 0 8px 48px rgba(0,0,0,0.4);
+  --card-shadow-lg: 0 12px 56px rgba(0,0,0,0.5);
+  --blog-shadow: 0 4px 24px rgba(0,0,0,0.15);
   --skill-card-bg: rgba(245,240,232,0.012);
   --hero-overlay: linear-gradient(135deg, rgba(5,5,5,0.65), rgba(5,5,5,0.05) 50%, rgba(5,5,5,0.7));
   --icon-bg: rgba(0,0,0,0.25);
@@ -37,6 +39,8 @@
   --card-bg2: rgba(0,0,0,0.018);
   --card-hover-bg: rgba(154,125,62,0.025);
   --card-shadow: 0 8px 40px rgba(0,0,0,0.06);
+  --card-shadow-lg: 0 12px 48px rgba(0,0,0,0.08);
+  --blog-shadow: 0 4px 20px rgba(0,0,0,0.05);
   --skill-card-bg: rgba(0,0,0,0.018);
   --hero-overlay: linear-gradient(135deg, rgba(248,246,241,0.88), rgba(248,246,241,0.25) 50%, rgba(248,246,241,0.92));
   --icon-bg: rgba(0,0,0,0.05);
@@ -142,12 +146,9 @@ body::before {
 /* ── Card (generic) ── */
 .card { padding: 2.5rem; border: 1px solid var(--line); cursor: default; transition: border-color 0.4s var(--ease-smooth), background 0.4s var(--ease-smooth), box-shadow 0.5s var(--ease-smooth); border-radius: 16px; }
 .card:hover { border-color: rgba(201,169,110,0.12); background: var(--card-hover-bg); box-shadow: var(--card-shadow); }
-.card-title { font-family: var(--font-display); font-size: 1.5rem; color: var(--white); margin-bottom: 0.6rem; font-weight: 600; letter-spacing: -0.01em; }
 .card-desc { font-family: var(--font-body); font-size: 0.9rem; color: var(--muted); line-height: 1.7; font-weight: 400; }
 .card-grid { display: grid; gap: 1rem; }
 .card-grid-2 { grid-template-columns: 1fr 1fr; }
-.card-grid-asymmetric { grid-template-columns: 1.5fr 1fr 1fr; }
-.card-outlined-num { font-family: var(--font-display); font-size: 2.5rem; color: transparent; -webkit-text-stroke: 1px rgba(201,169,110,0.2); line-height: 1; margin-bottom: 0.6rem; font-weight: 600; }
 .card-tag { font-family: var(--font-mono); font-size: 0.5rem; color: var(--muted); border: 1px solid var(--line); padding: 0.2rem 0.5rem; letter-spacing: 0.1em; text-transform: uppercase; }
 .card-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .card-company { font-family: var(--font-mono); font-size: 0.6rem; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.4rem; }
@@ -164,7 +165,7 @@ body::before {
 /* ── Projects ── */
 .projects-bento { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
 .project-card { padding: 2rem; border: 1px solid var(--line); background: var(--card-bg); display: flex; flex-direction: column; justify-content: space-between; cursor: default; transition: border-color 0.4s var(--ease-smooth), box-shadow 0.5s var(--ease-smooth), transform 0.3s var(--ease-smooth); border-radius: 16px; }
-.project-card:hover { border-color: rgba(201,169,110,0.18); box-shadow: 0 12px 56px rgba(0,0,0,0.4); transform: translateY(-2px); }
+.project-card:hover { border-color: rgba(201,169,110,0.18); box-shadow: var(--card-shadow-lg); transform: translateY(-2px); }
 .project-card.featured { grid-column: 1 / -1; }
 .project-name { font-family: var(--font-display); font-size: clamp(1.3rem, 1.8vw, 1.8rem); line-height: 1; color: var(--white); margin-bottom: 0.6rem; font-weight: 600; letter-spacing: -0.01em; }
 .project-desc { font-family: var(--font-body); font-size: 0.8rem; color: var(--muted); line-height: 1.65; margin-bottom: 1rem; flex-grow: 1; }
@@ -179,7 +180,7 @@ body::before {
 /* ── Blog ── */
 .blog-grid { display: flex; flex-direction: column; gap: 2rem; max-width: 820px; }
 .blog-post { padding: 2rem; border: 1px solid var(--line); border-radius: 16px; background: var(--card-bg2); transition: border-color 0.3s var(--ease-smooth), box-shadow 0.4s var(--ease-smooth); }
-.blog-post:hover { border-color: rgba(201,169,110,0.12); box-shadow: 0 4px 24px rgba(0,0,0,0.15); }
+.blog-post:hover { border-color: rgba(201,169,110,0.12); box-shadow: var(--blog-shadow); }
 .blog-meta { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 0.6rem; }
 .blog-date { font-family: var(--font-mono); font-size: 0.55rem; color: var(--muted); letter-spacing: 0.1em; }
 .blog-tag { font-family: var(--font-mono); font-size: 0.5rem; color: var(--accent); border: 1px solid rgba(201,169,110,0.15); padding: 0.15rem 0.5rem; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 4px; }

@@ -3,6 +3,8 @@ import { motion, type Variants } from 'framer-motion'
 import posts from '../data/blog'
 import SanitizedHtml from './SanitizedHtml'
 
+const fmtDate = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+
 const ease = [0.32, 0.72, 0, 1] as const
 
 const container: Variants = {
@@ -85,7 +87,7 @@ export default function Blog() {
             className="blog-post"
           >
             <div className="blog-meta">
-              <time className="blog-date">{post.date}</time>
+              <time className="blog-date">{fmtDate(post.date)}</time>
               {post.tags.map(tag => (
                 <span key={tag} className="blog-tag">{tag}</span>
               ))}
