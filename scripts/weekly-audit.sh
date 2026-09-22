@@ -19,9 +19,19 @@ curl -sf http://kubera.140.245.227.176.nip.io/up > /dev/null && pass "kubera bac
 curl -sf --connect-timeout 5 http://140.245.227.176:5433/health > /dev/null 2>&1 && pass "pgbouncer" || fail "pgbouncer"
 curl -sf http://kubera.140.245.227.176.nip.io/status/ > /dev/null && pass "uptime-kuma" || fail "uptime-kuma"
 
-# --- CF Pages frontends ---
-for site in bepara chitragupta darpan unnati-70z udhyam vishwakarma kubera-d4k saraswati-7v3 narad-7hc; do
-  curl -sfL "https://$site.pages.dev" > /dev/null && pass "$site" || fail "$site"
+# --- CF Pages frontends (custom domains where set; legacy pages.dev-only for the rest) ---
+for site_url in\
+  "bepara|https://bepara.vayalabs.in"\
+  "chitragupta|https://chitragupta.vayalabs.in"\
+  "darpan|https://darpan.vayalabs.in"\
+  "udhyam|https://udhyam.vayalabs.in"\
+  "vishwakarma|https://vishwakarma.vayalabs.in"\
+  "unnati-70z|https://unnati-70z.pages.dev"\
+  "kubera-d4k|https://kubera-d4k.pages.dev"\
+  "saraswati-7v3|https://saraswati-7v3.pages.dev"\
+  "narad-7hc|https://narad-7hc.pages.dev"; do
+  name="${site_url%%|*}"; url="${site_url#*|}"
+  curl -sfL "$url" > /dev/null && pass "$name" || fail "$name"
 done
 
 # --- MCP Hub (direct, not tunnel) ---

@@ -12,7 +12,7 @@
       "TypeScript",
       "Supabase"
     ],
-    "live_url": "https://bepara.pages.dev/",
+    "live_url": "https://bepara.vayalabs.in/",
     "local": true,
     "last_updated": "2026-08-25",
     "github_remote": "git@github.com:sdachary/bepara.git"
@@ -30,7 +30,7 @@
       "Cloudflare Pages",
       "Supabase"
     ],
-    "live_url": "https://chitragupta.pages.dev/",
+    "live_url": "https://chitragupta.vayalabs.in/",
     "local": true,
     "last_updated": "2026-09-04",
     "github_remote": "git@github.com:sdachary/chitragupta.git"
@@ -49,7 +49,7 @@
       "TypeScript",
       "Cloudflare Pages"
     ],
-    "live_url": "https://darpan.pages.dev/",
+    "live_url": "https://darpan.vayalabs.in/",
     "local": false,
     "last_updated": "2026-07-31",
     "github_remote": "git@github.com:sdachary/darpan.git"
@@ -81,7 +81,7 @@
       "Supabase",
       "JavaScript"
     ],
-    "live_url": "https://udhyam.pages.dev/",
+    "live_url": "https://udhyam.vayalabs.in/",
     "local": true,
     "last_updated": "2026-07-26",
     "github_remote": "git@github.com:sdachary/udhyam.git"
@@ -113,7 +113,7 @@
       "PostgreSQL",
       "Docker"
     ],
-    "live_url": "https://sampada.pages.dev",
+    "live_url": "https://sampada.vayalabs.in",
     "local": true,
     "last_updated": "2026-07-29",
     "github_remote": "git@github.com:sdachary/sampada.git",
@@ -130,7 +130,7 @@
       "WebRTC",
       "JavaScript"
     ],
-    "live_url": "https://prayog.pages.dev/",
+    "live_url": "https://prayog.vayalabs.in/",
     "local": true,
     "last_updated": "2026-07-26",
     "github_remote": "git@github.com:sdachary/prayog.git"
@@ -165,7 +165,7 @@
       "TypeScript",
       "Supabase"
     ],
-    "live_url": "https://sadhan.pages.dev/",
+    "live_url": "https://sadhan.vayalabs.in/",
     "local": true,
     "last_updated": "2026-08-25",
     "github_remote": "git@github.com:sdachary/sadhan.git"
@@ -181,7 +181,7 @@
       "Supabase",
       "JavaScript"
     ],
-    "live_url": "https://vishwakarma.pages.dev/",
+    "live_url": "https://vishwakarma.vayalabs.in/",
     "local": true,
     "last_updated": "2026-08-25",
     "github_remote": "git@github.com:sdachary/vishwakarma.git"

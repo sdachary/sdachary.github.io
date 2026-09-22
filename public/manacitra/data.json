@@ -260,7 +260,7 @@
           "type": "app",
           "logo": "hono",
           "color": "#f97316",
-          "url": "https://chitragupta.pages.dev",
+          "url": "https://chitragupta.vayalabs.in",
           "desc": "Business ledger. Vite + Hono/TS. GST/TDS."
         },
         {
@@ -269,7 +269,7 @@
           "type": "app",
           "logo": "nextdotjs",
           "color": "#3b82f6",
-          "url": "https://bepara.pages.dev",
+          "url": "https://bepara.vayalabs.in",
           "desc": "Inventory SaaS. Next.js 16. Barcode scanning."
         },
         {
@@ -278,7 +278,7 @@
           "type": "app",
           "logo": "html5",
           "color": "#eab308",
-          "url": "https://udhyam.pages.dev",
+          "url": "https://udhyam.vayalabs.in",
           "desc": "Jewellery retail. Static HTML + Supabase."
         },
         {
@@ -287,7 +287,7 @@
           "type": "app",
           "logo": "react",
           "color": "#a855f7",
-          "url": "https://sampada.pages.dev",
+          "url": "https://sampada.vayalabs.in",
           "desc": "Personal finance OS. Rails + Docker on oradb."
         },
         {
@@ -296,7 +296,7 @@
           "type": "app",
           "logo": "nextdotjs",
           "color": "#6366f1",
-          "url": "https://sadhan.pages.dev",
+          "url": "https://sadhan.vayalabs.in",
           "desc": "AI career platform. Next.js 16."
         },
         {
@@ -305,7 +305,7 @@
           "type": "app",
           "logo": "cloudflare",
           "color": "#0d9488",
-          "url": "https://vishwakarma.pages.dev",
+          "url": "https://vishwakarma.vayalabs.in",
           "desc": "Provisioning portal. Static CF Pages + Supabase."
         },
         {
@@ -314,7 +314,7 @@
           "type": "app",
           "logo": "react",
           "color": "#ef4444",
-          "url": "https://darpan.pages.dev",
+          "url": "https://darpan.vayalabs.in",
           "desc": "DPDP compliance audits. AI reports, D1."
         },
         {
@@ -323,7 +323,7 @@
           "type": "app",
           "logo": "javascript",
           "color": "#06b6d4",
-          "url": "https://prayog.pages.dev",
+          "url": "https://prayog.vayalabs.in",
           "desc": "Browser tools + games. Formerly narad."
         },
         {

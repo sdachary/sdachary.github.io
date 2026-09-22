@@ -22,6 +22,5 @@ contact form → portfolio-contact CF Worker → Notion "Contact submissions" DB
 ## Integration Points
 - GitHub Pages — hosting; deploy from `.github/workflows/deploy.yml` (build + upload-pages-artifact + deploy-pages); CI from `ci.yml`.
 - Cloudflare — the `portfolio-contact` Worker (contact form → Notion). Site hosting is GitHub Pages only.
-- n8n (Render) — contact webhook → Notion submissions DB.
 - Plausible — cookieless analytics (`script.outbound-links.js` in `index.html`).
 - oradev (systemd timers) — `portfolio-sync.timer` runs `scripts/sync-activity.sh` daily (sources Recent Activity from the Paca API "Done" column, not public GitHub events); `manacitra-sync.timer` runs `scripts/sync-manacitra.sh` weekly (pulls repo, regenerates `public/manacitra/data.json` from live zone/service probing).
