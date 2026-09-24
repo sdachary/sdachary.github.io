@@ -1,0 +1,15 @@
+# portfolio.sdachary.github.io — SEO / GEO consolidation
+
+Core content: GST billing, invoice generation, tax compliance for Indian merchants.
+Main entries: / (dashboard preview), /terms, /privacy, /auth, /reset-password (disallowed from crawl).
+Features: GSTIN validation, e-invoice, TDS management, merchant profile.
+API reference: /rest/v1/* (Supabase tables), /api/auth/*.
+Structured data (JSON-LD): Organization + WebSite schema with addressCountry IN.
+Sitemap: https://portfolio.sdachary.github.io/sitemap.xml (auto-generated from build output).
+Robots: Allow /; Disallow /auth/, /reset-password, /dashboard/, /api/.
+AI crawlers: GPTBot, Google-Extended, anthropic-ai explicitly allowed.
+
+Update notes (2026-09-24):
+- Domain migrated from bepara.pages.dev → portfolio.sdachary.github.io; sitemap and robots URLs updated.
+- llms.txt added (this file) for Generative Engine Optimization.
+- AI user-agent rules added to robots.txt for GEO visibility.
