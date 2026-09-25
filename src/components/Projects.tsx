@@ -74,7 +74,6 @@ export default function Projects() {
         {sorted.map((p, i) => {
           const featured = isFeatured(p)
           const statusClass = `status-${p.status_key || 'local'}`
-          const tags = (p.tags || []).slice(0, 5)
 
           return (
             <motion.div
@@ -88,16 +87,9 @@ export default function Projects() {
                 <p className="project-desc">{p.description}</p>
               </div>
               <div>
-                {tags.length > 0 && (
-                  <div className="card-tags">
-                    {tags.map(t => (
-                      <span key={t} className="card-tag">{t}</span>
-                    ))}
-                  </div>
-                )}
                 {(p.live_url || p.github_url) && (
-                  <a href={p.live_url || p.github_url || ''} target="_blank" rel="noreferrer" className="project-link" style={{ marginTop: '1rem' }}>
-                    {p.live_url ? 'Visit Live' : 'View Source'} →
+                  <a href={p.live_url || p.github_url || ''} target="_blank" rel="noreferrer" className="project-link">
+                    {p.live_url ? 'Visit' : 'Source'} →
                   </a>
                 )}
               </div>
