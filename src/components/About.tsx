@@ -11,8 +11,9 @@ const ease = [0.32, 0.72, 0, 1] as const
 
 export default function About() {
   return (
-    <section id="about" className="section about-grid">
-      <div className="about-sticky">
+    <section id="about" className="section" style={{ paddingTop: '8rem' }}>
+      <div className="about-grid">
+        <div className="about-sticky">
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -46,6 +47,7 @@ export default function About() {
             >{p}</motion.p>
           </div>
         ))}
+      </div>
       </div>
     </section>
   )
