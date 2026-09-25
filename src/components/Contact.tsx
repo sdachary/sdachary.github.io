@@ -99,9 +99,12 @@ export default function Contact() {
                 aria-hidden="true"
                 style={{ position: 'absolute', left: -9999, width: 1, height: 1, opacity: 0 }}
               />
-              <input name="name" placeholder="Your Name" aria-label="Your Name" required className="contact-input" />
-              <input name="email" type="email" placeholder="Your Email" aria-label="Your Email" required className="contact-input" />
-              <textarea name="message" placeholder="Tell me about your project..." aria-label="Your Message" required rows={4} className="contact-input" style={{ resize: 'vertical', minHeight: 100 }} />
+              <label htmlFor="c-name" className="contact-form-label" style={{marginBottom:'0.6rem',display:'block'}}>Name</label>
+              <input id="c-name" name="name" placeholder="Your Name" aria-label="Your Name" required className="contact-input" />
+              <label htmlFor="c-email" className="contact-form-label" style={{marginBottom:'0.6rem',display:'block'}}>Email</label>
+              <input id="c-email" name="email" type="email" placeholder="Your Email" aria-label="Your Email" required className="contact-input" />
+              <label htmlFor="c-msg" className="contact-form-label" style={{marginBottom:'0.6rem',display:'block'}}>Message</label>
+              <textarea id="c-msg" name="message" placeholder="Tell me about your project..." aria-label="Your Message" required rows={4} className="contact-input" style={{ resize: 'vertical', minHeight: 100 }} />
               <button type="submit" disabled={status === 'sending'} className="contact-btn">
                 {status === 'sending' ? 'Sending…' : 'Send Message →'}
               </button>
