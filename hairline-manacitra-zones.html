@@ -900,7 +900,7 @@ function mount({ stage, svg, read }, value) {
   const bag = disposer();
   let hopDelay = value;
   const C = Cam(45, 0.5, 1.58);
-  fit(C, [[XMIN - 30, Y0 - 20, -8], [XMAX + 30, Y0 + (Z - 1) * YSTEP + 20, -8], [XMIN - 30, Y0 + (Z - 1) * YSTEP + 20, -8], [XMAX + 30, Y0 - 20, -8], [XMIN, Y0, 4], [XMAX, Y0 + YSTEP, 4]], 200, 166);
+  fit(C, [[XMIN + 4, Y0, -3], [XMAX - 4, Y0 + (Z - 1) * YSTEP, -3], [XMIN + 4, Y0 + (Z - 1) * YSTEP, -3], [XMAX - 4, Y0, -3], [XMIN, Y0, 4], [XMAX, Y0 + YSTEP, 4]], 200, 166);
   const P = proj(C), front = facing(C);
 
   const g = mk("g", {}, svg);
@@ -908,8 +908,8 @@ function mount({ stage, svg, read }, value) {
   // trunk
   const trunk = mk("path", { class: "dash", d: "" }, g);
   const trunkP = [
-    P((XMIN + XMAX) / 2, Y0 - 20, 0),
-    P((XMIN + XMAX) / 2, Y0 + (Z - 1) * YSTEP + 20, 0),
+    P((XMIN + XMAX) / 2, Y0 - 6, 0),
+    P((XMIN + XMAX) / 2, Y0 + (Z - 1) * YSTEP + 6, 0),
   ];
   trunk.setAttribute("d", "M" + trunkP[0][0] + " " + trunkP[0][1] + " L" + trunkP[1][0] + " " + trunkP[1][1]);
 
@@ -917,8 +917,8 @@ function mount({ stage, svg, read }, value) {
   for (let z = 0; z < Z; z++) {
     const y = Y0 + z * YSTEP;
     const base = mk("g", {}, g);
-    const [pr, pi] = rings(XMIN, y - 4, XMAX, y + 4, 3.2, 1.0);
-    put(solid(base), { sil: pr, crease: pi, z0: 0, z1: 0.8 });
+    const [pr, pi] = rings(XMIN, y - 2, XMAX, y + 2, 3.2, 1.0);
+    put(solid(base), { sil: pr, crease: pi, z0: 0, z1: 0.5 });
     const nodes = [];
     const n = 2 + z;
     for (let i = 0; i < n; i++) {
@@ -958,7 +958,7 @@ function mount({ stage, svg, read }, value) {
   let active = null;
   function resetLit() {
     const now = performance.now();
-    zones.flatMap((z) => z.nodes).forEach((n) => { tset(n.t, 0, now, 0); n.el.classList.remove("hi"); n.elHi.setAttribute("opacity", "0"); });
+    zones.flatMap((z) => z.nodes).forEach((n) => { tset(n.t, 0, now, 0); n.el.classList.remove("hi"); n.elHi; });
     links.forEach((l) => { tset(l.t, 0, now, 0); l.p.classList.remove("hi"); l.p.classList.add("dash"); });
   }
 
@@ -1018,7 +1018,6 @@ function mount({ stage, svg, read }, value) {
       const v = tval(nd.t, now);
       if (!tdone(nd.t, now)) m = true;
       const op = 0.08 + v * 0.92;
-      nd.elHi.setAttribute("opacity", op.toFixed(3));
       if (v > 0.5) { nd.el.classList.add("hi"); } else { nd.el.classList.remove("hi"); }
     }
     for (const l of links) {
