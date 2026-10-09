@@ -74,6 +74,7 @@ export default function Projects() {
         {sorted.map((p, i) => {
           const featured = isFeatured(p)
           const statusClass = `status-${p.status_key || 'local'}`
+          const href = p.live_url || p.github_url
 
           return (
             <motion.div
@@ -81,18 +82,24 @@ export default function Projects() {
               variants={item}
               className={`project-card${featured ? ' featured' : ''}`}
             >
-              <div>
-                <div className={`status-badge ${statusClass}`}>{p.status}</div>
-                <h3 className="project-name">{p.name}</h3>
-                <p className="project-desc">{p.description}</p>
-              </div>
-              <div>
-                {(p.live_url || p.github_url) && (
-                  <a href={p.live_url || p.github_url || ''} target="_blank" rel="noreferrer" className="project-link">
-                    {p.live_url ? 'Visit' : 'Source'} →
+              <div className={`status-badge ${statusClass}`}>{p.status}</div>
+              {href ? (
+                <h3 className="project-name">
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="project-name-link"
+                    aria-label={`${p.name} — opens in a new tab`}
+                  >
+                    {p.name}
+                    <span className="project-name-arrow" aria-hidden="true">↗</span>
                   </a>
-                )}
-              </div>
+                </h3>
+              ) : (
+                <h3 className="project-name">{p.name}</h3>
+              )}
+              <p className="project-desc">{p.description}</p>
             </motion.div>
           )
         })}
