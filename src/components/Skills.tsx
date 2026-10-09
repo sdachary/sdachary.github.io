@@ -1,4 +1,5 @@
 import { motion, type Variants } from 'framer-motion'
+import { Terrain } from '@lucasmarkes/hairline/react'
 import skills from '../data/skills'
 
 const ease = [0.32, 0.72, 0, 1] as const
@@ -16,7 +17,14 @@ const item: Variants = {
 export default function Skills() {
   return (
     <section id="skills" className="section">
-      <div className="section-header">
+      <style>{`.terrain-figure { --hairline-plate: var(--bg); }`}</style>
+      <div className="section-header" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
+        <Terrain
+          intensity={0.5}
+          className="terrain-figure"
+          style={{ width: 180, flexShrink: 0, aspectRatio: '5/4' }}
+          aria-label="Terrain hairline figure"
+        />
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
