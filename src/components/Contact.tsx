@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { CONFIG } from '../config'
 
 const links = [
-  { href: 'mailto:deepakachary246@gmail.com', label: 'deepakachary246@gmail.com' },
+  { href: 'mailto:deepakachary246@gmail.com', label: 'deepakachary246@gmail.com', wide: true },
   { href: 'https://www.linkedin.com/in/sdeepakachary/', label: 'LinkedIn' },
   { href: 'https://x.com/sdeepakachary', label: 'Twitter/X' },
   { href: 'https://github.com/sdachary', label: 'GitHub' },
@@ -45,7 +45,7 @@ export default function Contact() {
       <div className="contact-bg-text" aria-hidden="true">DEEPAK</div>
 
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 1100 }}>
-        <div className="section-header">
+        <div className="section-header contact-header">
           <h2 className="section-title">Let's Connect</h2>
         </div>
 
@@ -72,9 +72,10 @@ export default function Contact() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: 0.2 + i * 0.08, ease }}
-                  className="contact-link"
+                  className={`contact-link${l.wide ? ' contact-link-wide' : ''}`}
                 >
-                  → {l.label}
+                  <span aria-hidden="true">→</span>
+                  <span className="contact-link-label">{l.label}</span>
                 </motion.a>
               ))}
             </nav>

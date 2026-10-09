@@ -5,7 +5,13 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores([
+    'dist',
+    // Hairline figure sources + the skill that builds them: standalone scripts,
+    // not part of the app bundle.
+    'manacitra-zones.js',
+    '.agents/**',
+  ]),
   {
     files: ['**/*.{js,jsx}'],
     extends: [
