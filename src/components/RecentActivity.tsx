@@ -24,9 +24,11 @@ export default function RecentActivity() {
   const railScale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.3, 1, 1, 0.3])
 
   useEffect(() => {
-    fetch(import.meta.env.BASE_URL + 'activity.json')
+    const base = import.meta.env.BASE_URL || '/'
+    const url = (base.endsWith('/') ? base + 'activity.json' : base + '/activity.json')
+    fetch(url)
       .then(r => r.ok ? r.json() : [])
-      .then(d => { setActivity([...d].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 8)); setLoading(false) })
+      .then(d => { setActivity([...d].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 10)); setLoading(false) })
       .catch(() => { setError(true); setLoading(false) })
   }, [])
 

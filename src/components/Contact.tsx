@@ -88,8 +88,9 @@ export default function Contact() {
             transition={{ duration: 0.8, delay: 0.2, ease }}
             className="contact-form"
             aria-label="Contact form"
+            noValidate={false}
           >
-            <div className="contact-form-label">Send a message</div>
+            <div className="contact-form-label" style={{ textAlign: 'left', display: 'block' }}>Send a message</div>
             <div className="contact-form-fields">
               <input
                 type="text"
@@ -97,18 +98,24 @@ export default function Contact() {
                 autoComplete="off"
                 tabIndex={-1}
                 aria-hidden="true"
-                style={{ position: 'absolute', left: -9999, width: 1, height: 1, opacity: 0 }}
+                style={{ position: 'absolute', left: -9999, width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
               />
-              <label htmlFor="c-name" className="contact-form-label" style={{marginBottom:'0.6rem',display:'block'}}>Name</label>
-              <input id="c-name" name="name" placeholder="Your Name" aria-label="Your Name" required className="contact-input" />
-              <label htmlFor="c-email" className="contact-form-label" style={{marginBottom:'0.6rem',display:'block'}}>Email</label>
-              <input id="c-email" name="email" type="email" placeholder="Your Email" aria-label="Your Email" required className="contact-input" />
-              <label htmlFor="c-msg" className="contact-form-label" style={{marginBottom:'0.6rem',display:'block'}}>Message</label>
-              <textarea id="c-msg" name="message" placeholder="Tell me about your project..." aria-label="Your Message" required rows={4} className="contact-input" style={{ resize: 'vertical', minHeight: 100 }} />
+              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label htmlFor="c-name" className="contact-form-label" style={{ marginBottom: 0, textAlign: 'left', display: 'block' }}>Name</label>
+                <input id="c-name" name="name" placeholder="Your Name" aria-label="Your Name" required className="contact-input" autoComplete="name" />
+              </div>
+              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label htmlFor="c-email" className="contact-form-label" style={{ marginBottom: 0, textAlign: 'left', display: 'block' }}>Email</label>
+                <input id="c-email" name="email" type="email" placeholder="Your Email" aria-label="Your Email" required className="contact-input" autoComplete="email" />
+              </div>
+              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label htmlFor="c-msg" className="contact-form-label" style={{ marginBottom: 0, textAlign: 'left', display: 'block' }}>Message</label>
+                <textarea id="c-msg" name="message" placeholder="Tell me about your project..." aria-label="Your Message" required rows={4} className="contact-input" style={{ resize: 'vertical', minHeight: 100, textAlign: 'left' }} />
+              </div>
               <button type="submit" disabled={status === 'sending'} className="contact-btn">
                 {status === 'sending' ? 'Sending…' : 'Send Message →'}
               </button>
-              <div aria-live="polite">
+              <div aria-live="polite" style={{ width: '100%' }}>
                 {status === 'success' && (
                   <p className="contact-success">✓ Message sent! I'll get back to you soon.</p>
                 )}

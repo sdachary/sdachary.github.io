@@ -5,7 +5,9 @@ const ease = [0.32, 0.72, 0, 1] as const
 export default function Hero() {
   return (
     <section id="hero" className="hero">
-      <div className="hero-bg" aria-hidden="true" />
+      <div className="hero-bg" aria-hidden="true">
+        <div className="hero-glow" aria-hidden="true" />
+      </div>
 
       <div className="hero-content">
         <motion.div
