@@ -1,28 +1,18 @@
 import { motion } from 'framer-motion'
-import { Relay } from '@lucasmarkes/hairline/react'
 
 const ease = [0.32, 0.72, 0, 1] as const
 
 export default function ManacitraSection() {
   return (
     <section id="manacitra" className="section section-alt section-divider" style={{ overflow: 'hidden' }}>
-      <style>{`.relay-figure { --hairline-plate: var(--bg2); }`}</style>
       <div className="section-header">
         <h2 className="section-title">Manacitra</h2>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
-          <Relay
-            intensity={0.55}
-            className="relay-figure"
-            style={{ width: 200, flexShrink: 0, aspectRatio: '5/4' }}
-            aria-label="Relay hairline figure"
-          />
-          <p
-            className="activity-desc"
-            style={{ maxWidth: '38rem', flex: 1, minWidth: '20rem' }}
-          >
-            Live infrastructure map of all projects — zones, services, and connections. Click a service to visit it, or open the map full-screen.
-          </p>
-        </div>
+        <p
+          className="activity-desc"
+          style={{ maxWidth: '38rem' }}
+        >
+          Live infrastructure map of all projects — zones, services, and connections. Click a service to visit it, or open the map full-screen.
+        </p>
       </div>
       <motion.div
         initial={{ opacity: 0, y: 24 }}
