@@ -26,15 +26,6 @@
           }
         },
         {
-          "id": "nginx",
-          "name": "Nginx",
-          "type": "proxy",
-          "logo": "nginx",
-          "color": "#dc2626",
-          "h": 2.8,
-          "desc": "Reverse proxy. Routes /auth/v2/, /mail/, /rest/v1/. Port 80."
-        },
-        {
           "id": "postgrest",
           "name": "PostgREST",
           "type": "api",
@@ -96,15 +87,6 @@
           "color": "#6366f1",
           "h": 1.6,
           "desc": "Next.js server. Career platform APIs. Port 4002."
-        },
-        {
-          "id": "headroom",
-          "name": "Headroom",
-          "type": "monitoring",
-          "logo": "monitor",
-          "color": "#06b6d4",
-          "h": 1,
-          "desc": "SQL monitoring dashboard. Port 8787."
         },
         {
           "id": "gatus",
@@ -501,17 +483,13 @@
   ],
   "generated_at": "2026-09-12T08:00:00.000Z",
   "stats": {
-    "total_services": 32,
-    "online": 32,
+    "total_services": 30,
+    "online": 30,
     "zones": 5,
     "connections": 20,
-    "total": 32
+    "total": 30
   },
   "health": {
-    "nginx": {
-      "online": true,
-      "checked_at": "2026-09-04T07:26:57.775Z"
-    },
     "postgrest": {
       "online": true,
       "checked_at": "2026-09-04T07:26:57.775Z"
@@ -533,10 +511,6 @@
       "checked_at": "2026-09-04T07:26:57.775Z"
     },
     "sadhan-server": {
-      "online": true,
-      "checked_at": "2026-09-04T07:26:57.775Z"
-    },
-    "headroom": {
       "online": true,
       "checked_at": "2026-09-04T07:26:57.775Z"
     },

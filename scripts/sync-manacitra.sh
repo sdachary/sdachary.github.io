@@ -36,21 +36,22 @@ async function run() {
   data.generated_at = new Date().toISOString();
 
   const checks = [
-    { id: 'nginx',       cmd: "ssh -o StrictHostKeyChecking=accept-new 140.245.227.176 'curl -s -o /dev/null -w %{http_code} http://localhost 2>/dev/null' 2>/dev/null | grep -qE '^[234]'", ssh: true },
     { id: 'postgrest',   cmd: "ssh -o StrictHostKeyChecking=accept-new 140.245.227.176 'curl -s -o /dev/null -w %{http_code} http://localhost:3000 2>/dev/null' 2>/dev/null | grep -qE '^[234]'", ssh: true },
     { id: 'better-auth', cmd: "ssh -o StrictHostKeyChecking=accept-new 140.245.227.176 'curl -s -o /dev/null -w %{http_code} http://localhost:4000/api/auth/health 2>/dev/null' 2>/dev/null | grep -qE '^[234]'", ssh: true },
     { id: 'mail-relay',  cmd: "ssh -o StrictHostKeyChecking=accept-new 140.245.227.176 'curl -s -o /dev/null -w %{http_code} http://localhost:4001/health 2>/dev/null' 2>/dev/null | grep -qE '^[234]'", ssh: true },
     { id: 'sampada-api', cmd: "ssh -o StrictHostKeyChecking=accept-new 140.245.227.176 'curl -s -o /dev/null -w %{http_code} http://localhost:3002 2>/dev/null' 2>/dev/null | grep -qE '^[234]'", ssh: true },
-    { id: 'bepara-api',  cmd: "ssh -o StrictHostKeyChecking=accept-new 140.245.227.176 'curl -s -o /dev/null -w %{http_code} http://localhost:3001/api/health 2>/dev/null' 2>/dev/null | grep -qE '^[234]'", ssh: true },
+    // bepara-api is no longer a Node process on oradb (:3001 decommissioned
+    // 2026-10-11) — the API runs as the Cloudflare Worker `bepara-api-production`,
+    // so probe its public Worker origin rather than the dead local port.
+    { id: 'bepara-api',  url: 'https://bepara.vayalabs.in/api/health' },
     { id: 'sadhan-server',cmd:"ssh -o StrictHostKeyChecking=accept-new 140.245.227.176 'curl -s -o /dev/null -w %{http_code} http://localhost:4002/api/health 2>/dev/null' 2>/dev/null | grep -qE '^[234]'", ssh: true },
-    { id: 'headroom',    cmd: "ssh -o StrictHostKeyChecking=accept-new 140.245.227.176 'curl -s -o /dev/null -w %{http_code} -H \"Host: headroom.140.245.227.176.nip.io\" http://localhost:8787 2>/dev/null' 2>/dev/null | grep -qE '^[234]'", ssh: true },
     { id: 'gatus',       cmd: "ssh -o StrictHostKeyChecking=accept-new 140.245.227.176 'curl -s -o /dev/null -w %{http_code} http://localhost:8080 2>/dev/null' 2>/dev/null | grep -qE '^[234]'", ssh: true },
     { id: 'pg16',        cmd: "ssh -o StrictHostKeyChecking=accept-new 140.245.227.176 'pg_isready -q' 2>/dev/null", ssh: true },
     { id: 'redis',       cmd: "ssh -o StrictHostKeyChecking=accept-new 140.245.227.176 'redis-cli ping' 2>/dev/null | grep -q PONG", ssh: true },
     { id: 'mcp-hub',     url: 'http://localhost:3000/api/healthz' },
-    { id: 'paca',        url: 'http://localhost:80/' },
     { id: 'ttyd',        url: 'http://localhost:7681/' },
-    { id: 'minio',       cmd: "sudo docker inspect --format '{{.State.Health.Status}}' paca-minio-1 2>/dev/null | grep -q healthy", ssh: true },
+    { id: 'step-ca',     cmd: "sudo docker inspect --format '{{.State.Health.Status}}' step-ca 2>/dev/null | grep -q healthy", ssh: true },
+    { id: 'coturn',      cmd: "systemctl is-active coturn 2>/dev/null | grep -q active", ssh: true },
     { id: 'pihole',      cmd: "sudo docker inspect --format '{{.State.Health.Status}}' pihole 2>/dev/null | grep -q healthy", ssh: true },
     { id: 'unbound',     cmd: "systemctl is-active pihole-docker-user 2>/dev/null | grep -q active", ssh: true },
     { id: 'tailscale',   cmd: "systemctl is-active tailscaled 2>/dev/null | grep -q active", ssh: true },
