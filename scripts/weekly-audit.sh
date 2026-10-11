@@ -47,7 +47,7 @@ done
 probe "better-auth (api)"   "https://api.vayalabs.in/api/auth/get-session"
 probe "mail-relay (api)"    "https://api.vayalabs.in/mail/health"
 probe "sadhan API"          "https://api-sadhan.vayalabs.in/api/health"
-probe "sampada API"         "https://sampada.vayalabs.in/api/v1/countries"
+probe "sampada API"         "https://sampada.vayalabs.in/api/healthz"
 probe "bepara API (Worker)" "https://bepara.vayalabs.in/api/health"
 
 # --- Monitoring (uptime-kuma retired, Gatus replaced it) ---
@@ -57,8 +57,14 @@ probe "github pages" "https://sdachary.github.io/"
 # --- oradev local services ---
 mcp=$(curl -s -o /dev/null -w '%{http_code}' --max-time 6 http://localhost:3000/api/health 2>/dev/null)
 [ "$mcp" = "200" ] && pass "mcp-hub" || fail "mcp-hub (got ${mcp:-000})"
+# ttyd sits behind Basic auth, so an unauthenticated probe gets 401 — which
+# still proves the process is up and answering. Only a connection failure or
+# a 5xx counts as down.
 ttyd=$(curl -s -o /dev/null -w '%{http_code}' --max-time 6 http://localhost:7681/ 2>/dev/null)
-[ "$ttyd" = "200" ] && pass "ttyd" || fail "ttyd (got ${ttyd:-000})"
+case "$ttyd" in
+  200|401) pass "ttyd" ;;
+  *)       fail "ttyd (got ${ttyd:-000})" ;;
+esac
 
 echo ""
 echo "=== Results: $P passed, $F failed ==="
