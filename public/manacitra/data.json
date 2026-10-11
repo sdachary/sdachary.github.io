@@ -21,7 +21,7 @@
           "meta": {
             "protocol": "TCP 5432",
             "dataStored": "All app schemas",
-            "pii": "Yes \u2014 identity data",
+            "pii": "Yes — identity data",
             "topology": "oradb only, single node"
           }
         },
@@ -96,22 +96,6 @@
           "color": "#6366f1",
           "h": 1.6,
           "desc": "Next.js server. Career platform APIs. Port 4002."
-        },
-        {
-          "id": "nidhiflow-api",
-          "name": "Nidhiflow API",
-          "type": "api",
-          "logo": "nestjs",
-          "color": "#e11d48",
-          "h": 1.6,
-          "desc": "NestJS financial identity API. Prisma, PG16. Port 4003.",
-          "meta": {
-            "protocol": "HTTP :4003",
-            "upstream": "pg16 (nidhi schema)",
-            "dataStored": "Identity records",
-            "pii": "Yes \u2014 DPDPA",
-            "topology": "oradb Docker, modular monolith"
-          }
         },
         {
           "id": "headroom",
@@ -248,7 +232,7 @@
       "id": "cloudflare",
       "name": "cloudflare",
       "label": "EDGE TIER",
-      "subtitle": "Pages \u00b7 10 apps",
+      "subtitle": "Pages · 10 apps",
       "x": -12,
       "z": -4,
       "color": "#f38020",
@@ -334,20 +318,6 @@
           "color": "#f8fafc",
           "url": "https://sdachary.github.io",
           "desc": "Personal portfolio. Vite + React. GitHub Pages."
-        },
-        {
-          "id": "nidhiflow",
-          "name": "Nidhiflow",
-          "type": "app",
-          "logo": "nextdotjs",
-          "color": "#be185d",
-          "url": "https://nidhiflow.pages.dev",
-          "desc": "Financial identity. Next.js static web.",
-          "meta": {
-            "protocol": "HTTPS",
-            "upstream": "nidhiflow-api via oradb",
-            "pii": "No \u2014 server-rendered shell only"
-          }
         }
       ]
     },
@@ -382,7 +352,7 @@
           "meta": {
             "protocol": "HTTPS",
             "dataStored": "Tasks, wiki content",
-            "pii": "No \u2014 team workspace",
+            "pii": "No — team workspace",
             "topology": "External SaaS"
           }
         }
@@ -392,7 +362,7 @@
       "id": "personal",
       "name": "home",
       "label": "HOME TIER",
-      "subtitle": "tailnet \u00b7 DNS clients",
+      "subtitle": "tailnet · DNS clients",
       "x": 0,
       "z": 14,
       "color": "#db2777",
@@ -459,11 +429,6 @@
       "label": "API"
     },
     {
-      "from": "nidhiflow",
-      "to": "oradb",
-      "label": "API"
-    },
-    {
       "from": "tailscale",
       "to": "oradb",
       "label": "Tailnet"
@@ -476,7 +441,7 @@
     {
       "from": "mcp-hub",
       "to": "oradb",
-      "label": "MCP \u2192 DB"
+      "label": "MCP → DB"
     },
     {
       "from": "better-auth",
@@ -500,11 +465,6 @@
     },
     {
       "from": "sadhan-server",
-      "to": "pg16",
-      "label": "DB"
-    },
-    {
-      "from": "nidhiflow-api",
       "to": "pg16",
       "label": "DB"
     },
@@ -541,11 +501,11 @@
   ],
   "generated_at": "2026-09-12T08:00:00.000Z",
   "stats": {
-    "total_services": 34,
-    "online": 34,
+    "total_services": 32,
+    "online": 32,
     "zones": 5,
-    "connections": 22,
-    "total": 34
+    "connections": 20,
+    "total": 32
   },
   "health": {
     "nginx": {
@@ -573,10 +533,6 @@
       "checked_at": "2026-09-04T07:26:57.775Z"
     },
     "sadhan-server": {
-      "online": true,
-      "checked_at": "2026-09-04T07:26:57.775Z"
-    },
-    "nidhiflow-api": {
       "online": true,
       "checked_at": "2026-09-04T07:26:57.775Z"
     },
@@ -657,10 +613,6 @@
       "checked_at": "2026-09-04T07:26:57.775Z"
     },
     "sadhan": {
-      "online": true,
-      "checked_at": "2026-09-04T07:26:57.775Z"
-    },
-    "nidhiflow": {
       "online": true,
       "checked_at": "2026-09-04T07:26:57.775Z"
     },

@@ -202,23 +202,5 @@
     "local": true,
     "last_updated": "2026-08-25",
     "github_remote": "git@github.com:sdachary/portfolio.git"
-  },
-  {
-    "name": "NIDHIFLOW",
-    "slug": "nidhiflow",
-    "status": "Live",
-    "status_key": "live",
-    "description": "User-owned digital financial identity — aggregates, organizes, verifies, and shares financial information with full user control and consent. Modular monolith: NestJS API + Next.js static web, Prisma + PG16, Docker on oradb.",
-    "tags": [
-      "NestJS",
-      "Next.js",
-      "Prisma",
-      "TypeScript",
-      "PostgreSQL"
-    ],
-    "live_url": "https://nidhiflow.pages.dev",
-    "local": true,
-    "last_updated": "2026-08-10",
-    "github_remote": "git@github.com:sdachary/nidhiflow.git"
   }
 ]

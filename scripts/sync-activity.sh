@@ -59,7 +59,7 @@ function get(url) {
 
 // project label inferred from the task title; infra/board-level work -> INFRA/ACHARYLAB
 const KNOWN = ["SAMPADA","SADHAN","BEPARA","DARPAN","CHITRAGUPTA","UDHYAM","VISHWAKARMA",
-               "PRAYOG","SARASWATI","NIDHIFLOW","MCP-HUB","PORTFOLIO","MANACITRA","AHAM",
+               "PRAYOG","SARASWATI","MCP-HUB","PORTFOLIO","MANACITRA","AHAM",
                "KARMA","INDRA"];
 function projectFor(title) {
   const t = title.toUpperCase();
@@ -85,7 +85,7 @@ function kindFor(title) {
 // current phase per project — keep in sync with wiki/ROADMAP.md when phases roll.
 // Existing entries keep their stored phase; this applies to NEW entries only.
 const PHASE_MAP = {
-  PORTFOLIO: "Phase 65", MANACITRA: "Phase 65", AHAM: "Phase 65", NIDHIFLOW: "Phase 58",
+  PORTFOLIO: "Phase 65", MANACITRA: "Phase 65", AHAM: "Phase 65",
   SAMPADA: "Phase 57", SADHAN: "Phase 60", "MCP-HUB": "Phase 52", BEPARA: "Phase 61",
   CHITRAGUPTA: "Phase 61", DARPAN: "Phase 61", KARMA: "Phase 61", PRAYOG: "Phase 61",
   UDHYAM: "Phase 64", VISHWAKARMA: "Phase 61", INDRA: "Phase 61", SARASWATI: "Phase 61",
