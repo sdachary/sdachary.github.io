@@ -8,13 +8,7 @@ export default function ManacitraSection() {
     <section id="manacitra" className="section section-alt section-divider" style={{ overflow: 'hidden' }}>
       <style>{`.relay-figure { --hairline-plate: var(--bg2); }`}</style>
       <div className="section-header">
-        <motion.h2
-          initial={{ opacity: 0, letterSpacing: '0.3em' }}
-          whileInView={{ opacity: 1, letterSpacing: '-0.02em' }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, ease }}
-          className="section-title"
-        >Manacitra</motion.h2>
+        <h2 className="section-title">Manacitra</h2>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
           <Relay
             intensity={0.55}
@@ -22,16 +16,12 @@ export default function ManacitraSection() {
             style={{ width: 200, flexShrink: 0, aspectRatio: '5/4' }}
             aria-label="Relay hairline figure"
           />
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1, ease }}
+          <p
             className="activity-desc"
             style={{ maxWidth: '38rem', flex: 1, minWidth: '20rem' }}
           >
             Live infrastructure map of all projects — zones, services, and connections. Click a service to visit it, or open the map full-screen.
-          </motion.p>
+          </p>
         </div>
       </div>
       <motion.div
