@@ -125,8 +125,21 @@ else
 fi
 
 git add "$DATA_FILE"
-if git diff --cached --quiet; then
-  echo "No changes to commit."
+# The map stamps `generated_at` plus a per-service `checked_at` on every run, so
+# a naive "commit if the file differs" pushes ~52 no-op commits a year. Ask git
+# whether anything OTHER than those two keys changed; if not, discard the stamp
+# so the working tree stays clean. Discarding matters as much as not committing:
+# a dirty tree breaks next week's `git pull --ff-only`, which is the failure
+# this script already had once.
+#
+# The pattern is deliberately unanchored — the keys are indented in the file, so
+# a `^` anchor never matches them. Validated against a scratch repo that real
+# changes still commit: `online` flipping, an `id` rename, and an added field
+# were all committed, while a timestamps-only run was discarded.
+if git diff --cached --quiet --ignore-matching-lines='"(generated_at|checked_at)":' -- "$DATA_FILE"; then
+  echo "No real change (timestamps only) — discarding the stamp."
+  git reset -q -- "$DATA_FILE"
+  git checkout -- "$DATA_FILE"
 else
   git commit -m "sync: manacitra $(date +%F)"
   git push origin main
