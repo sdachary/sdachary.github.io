@@ -38,7 +38,7 @@ export default function RecentActivity() {
       <div className="activity-wrap"><div className="activity-rail" />
         {[1,2].map(i => <div key={i} className="activity-row">
           <div className="activity-dot" />
-          <div className="activity-card" style={{ opacity: 0.3, height: 60, width: '100%' }} />
+          <div className="activity-card activity-card-skeleton" />
         </div>)}
       </div>
     </section>

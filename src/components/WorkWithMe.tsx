@@ -25,7 +25,9 @@ const tracks: WorkTrack[] = [
 const ease = [0.32, 0.72, 0, 1] as const
 
 function Card({ data, side, accent }: { data: WorkTrack; side: 'left' | 'right'; accent: string }) {
-  const borderColor = accent === 'var(--accent)' ? 'rgba(201,169,110,0.25)' : 'rgba(58,74,107,0.25)'
+  // Tint the border from the track's own accent so both cards stay inside the
+  // warm palette (the old values were leftover cool-blue + dark-theme gold).
+  const borderColor = `color-mix(in srgb, ${accent} 25%, transparent)`
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
@@ -37,10 +39,10 @@ function Card({ data, side, accent }: { data: WorkTrack; side: 'left' | 'right';
         For {data.target}
       </div>
       <h2 className="dual-title">{data.role}</h2>
-      <div className="card-period" style={{ color: accent, fontSize: '0.75rem', letterSpacing: '0.1em', marginBottom: '1.5rem' }}>
+      <div className="card-period dual-subtitle" style={{ color: accent }}>
         {data.subtitle}
       </div>
-      <p className="card-desc" style={{ marginBottom: '2rem', fontSize: '0.95rem' }}>
+      <p className="card-desc dual-desc">
         {data.desc}
       </p>
       <a href={data.href} className="project-link" style={{ borderColor, color: accent }}>

@@ -66,7 +66,7 @@ function FlowEditorPage() {
   }
 
   return (
-    <div style={{ width: '100vw', height: '100vh', background: '#f4f5f7', position: 'relative', overflow: 'hidden' }}>
+    <div style={{ width: '100vw', height: '100dvh', background: '#f4f5f7', position: 'relative', overflow: 'hidden' }}>
       <FlowEditor data={data} />
     </div>
   );

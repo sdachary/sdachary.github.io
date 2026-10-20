@@ -34,7 +34,7 @@ export default function Projects() {
     <section id="projects" className="section section-alt">
       <div className="section-header"><h2 className="section-title">Projects</h2></div>
       <div className="projects-bento">
-        {[1,2,3].map(i => <div key={i} className="project-card" style={{ opacity: 0.3, height: 180 }} />)}
+        {[1,2,3].map(i => <div key={i} className="project-card project-card-skeleton" />)}
       </div>
     </section>
   )
@@ -53,7 +53,7 @@ export default function Projects() {
     .sort((a, b) => a.name.localeCompare(b.name))
 
   return (
-    <section id="projects" className="section section-alt" style={{ overflow: 'hidden' }}>
+    <section id="projects" className="section section-alt section-clip">
       <div className="section-header">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}

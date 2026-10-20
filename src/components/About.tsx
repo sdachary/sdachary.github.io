@@ -11,7 +11,7 @@ const ease = [0.32, 0.72, 0, 1] as const
 
 export default function About() {
   return (
-    <section id="about" className="section" style={{ paddingTop: '8rem' }}>
+    <section id="about" className="section about-section">
       <div className="about-grid">
         <div className="about-sticky">
         <motion.div

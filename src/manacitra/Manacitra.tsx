@@ -216,7 +216,7 @@ export default function Manacitra() {
   }, [setData]);
 
   return (
-    <div data-contrast={highContrast ? 'high' : 'normal'} style={{ width: '100vw', height: '100vh', background: '#f4f5f7', position: 'relative', overflow: 'hidden' }}>
+    <div data-contrast={highContrast ? 'high' : 'normal'} style={{ width: '100vw', height: '100dvh', background: '#f4f5f7', position: 'relative', overflow: 'hidden' }}>
       {error ? (
         <div style={{
           position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
@@ -265,7 +265,7 @@ export default function Manacitra() {
           } : {
             display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 10,
             padding: '10px 12px', width: 'fit-content', minWidth: 208, maxWidth: 224,
-            maxHeight: 'calc(100vh - 8rem)', overflowY: 'auto',
+            maxHeight: 'calc(100dvh - 8rem)', overflowY: 'auto',
             background: 'rgba(247,245,240,0.92)', backdropFilter: 'blur(24px)',
             border: '1px solid rgba(28,28,26,0.08)', borderRadius: 16,
           }}>
