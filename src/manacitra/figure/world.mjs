@@ -253,6 +253,15 @@ export function buildWorld(data) {
   }
   const edges = conns.map((c) => ({ idx: c.idx, a: c.a, b: c.b }));
 
+  // health comes from the same data.json the page polls: a lamp burns only
+  // while its service answers.
+  const health = data.health || {};
+  for (const st of stations) {
+    const h = health[st.svc.id];
+    st.online = Boolean(h?.online);
+    st.checkedAt = h?.checked_at || null;
+  }
+
   const online = Object.values(data.health || {}).filter((h) => h.online).length;
   return {
     data,

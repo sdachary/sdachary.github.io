@@ -19,32 +19,26 @@ const P = computeCamera(world);
 
 const R = A.recorder(P);
 const fig = buildFigure(world, { P, A, R, settle: A.settle });
+// Crowding allowlist. Every pair here is a sub-pixel screen near-miss between
+// a cord and the hardware it is bolted to, or between two cords that cross at
+// very different depths; the 3D clearance check above already passes at zero,
+// and the depth column in the report shows these are 18–120 units apart in
+// depth, so nothing actually touches. The nameplate and plug-barrel pairs come
+// from the audit's rod approximation of thin plates.
 A.auditOrExit(R, P, {
   crowd: [
-    ['plug*', 'plate.*'],
-    ['plug*', 'skirt.*'],
-    ['plug*', 'strip.*'],
-    ['cord*', 'plug*'],
-    ['cord*', 'plate.*'],
-    ['cord*', 'skirt.*'],
-    ['cord*', 'strip.*'],
-    ['cord*', 'stand.desk'],
-    ['coil*', 'stand.desk'],
-    ['cord*', 'duct.*'],
-    ['cord13*', 'cord2*'],
-    ['cord12*', 'cord3*'],
-    ['cord9*', 'cord*'],
-    ['cord*', 'cord0*'],
+    ['cord*', 'plate.*'],   // cord ends graze the engraved nameplates below them
+    ['cord*', 'plug*'],     // plug barrels of neighbouring jacks, 0.5 px apart
+    ['cord*', 'skirt.*'],   // cord sag passes in front of the bay plinth
+    ['cord*', 'strip.*'],   // cord sag passes in front of the line strip
+    ['coil*', 'stand.desk'],// the spare cords rest on the desk on purpose
+    ['cord13*', 'cord2*'],  // two cords cross on screen, 19 units apart in depth
+    ['cord12*', 'cord3*'],  // two cords cross on screen, 35 units apart in depth
+    ['cord9*', 'cord0*'],   // two cords cross on screen, 38 units apart in depth
+    ['cord9*', 'cord16*'],  // two cords cross on screen, 120 units apart in depth
+    ['cord0*', 'cord3*'],   // two cords cross on screen, 38 units apart in depth
   ],
-  // depth order: these are stable crossovers in isometric at near-equal k; allow
-  // the recorder's remaining small interlock pairs
-  rest: [],
-  allow: [
-    ['cord:10:1.item', 'cord:3:1.item'],
-    ['cord:10:1.item', 'cord:9:0.item'],
-    ['cord:19:0.item', 'cord:6:0.item'],
-  ],
-  cover: ['stand.*'],
+  cover: ['stand.*'],      // the desk plate and its feet are drawn wider than their solids
 });
 
 writeFileSync(join(ROOT, "public/manacitra/keys.json"), JSON.stringify(fig.keys));

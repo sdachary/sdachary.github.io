@@ -7,7 +7,7 @@
 | Path | Content |
 |------|---------|
 | `/` | Homepage SPA — Hero, About, Experience, Projects, Mānacitra embed (iframe), Contact, legal footer links |
-| `/manacitra.html` | Mānacitra infrastructure map (zones, services, connections); embedded on the homepage |
+| `/manacitra.html` | Mānacitra infrastructure map — an isometric cord switchboard (one jack + lamp per service, one patch cord per connection, lamp state = health); embedded on the homepage |
 | `/floweditor.html` | Internal React Flow editor for the map (admin only, no public link) |
 | `/privacy.html` | DPDP privacy notice |
 | `/terms.html` | Terms of Service |
@@ -41,6 +41,7 @@ npm run dev
 | `npm run lint` | ESLint check |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint:manacitra` | Validate `public/manacitra/data.json` shape |
+| `node tools/manacitra/build.mjs --audit` | Build the switchboard plate and run the anatomy geometry audit (exits non-zero on any problem) |
 | `npm test` | Run tests (vitest) |
 | `npm run verify` | lint + typecheck + lint:manacitra + test |
 

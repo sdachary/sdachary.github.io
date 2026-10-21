@@ -9,52 +9,48 @@ function Loader({ progress, status }: { progress: number; status: string }) {
   return (
     <div style={{
       position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center', background: 'var(--mc-bg, #0e100d)',
+      alignItems: 'center', justifyContent: 'center', background: '#0b0b0b',
       zIndex: 100, transition: 'opacity 1s ease',
     }}>
       <div style={{
-        width: 48, height: 48, border: '1.5px solid rgba(156,176,156,0.08)',
-        borderTopColor: 'var(--mc-lamp-on, #9dbf9a)', borderRadius: '50%',
+        width: 48, height: 48, border: '1.5px solid rgba(163,163,163,0.12)',
+        borderTopColor: '#a3a3a3', borderRadius: '50%',
         animation: 'spin 1.2s cubic-bezier(0.4,0,0.2,1) infinite',
         marginBottom: '2rem',
       }} />
       <h1 style={{
         fontSize: '2.5rem', fontWeight: 300, letterSpacing: '-0.02em',
-        color: 'var(--mc-ink, #c9d3c9)', marginBottom: '.5rem',
+        color: '#a3a3a3', marginBottom: '.5rem',
       }}>Manacitra</h1>
-      <p style={{ color: 'rgba(201,211,201,0.35)', fontSize: '.8rem', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '.75rem' }}>
+      <p style={{ color: 'rgba(163,163,163,0.35)', fontSize: '.8rem', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '.75rem' }}>
         Cord switchboard
       </p>
-      <div style={{ width: 160, height: 1.5, background: 'rgba(156,176,156,0.06)', borderRadius: 2, marginTop: '.75rem', overflow: 'hidden' }}>
-        <span style={{ display: 'block', height: '100%', width: `${progress}%`, background: 'var(--mc-lamp-on, #9dbf9a)', borderRadius: 2, transition: 'width .5s ease' }} />
+      <div style={{ width: 160, height: 1.5, background: 'rgba(163,163,163,0.06)', borderRadius: 2, marginTop: '.75rem', overflow: 'hidden' }}>
+        <span style={{ display: 'block', height: '100%', width: `${progress}%`, background: '#a3a3a3', borderRadius: 2, transition: 'width .5s ease' }} />
       </div>
-      <p style={{ color: 'rgba(201,211,201,0.25)', fontSize: '.75rem', fontVariantNumeric: 'tabular-nums', marginTop: '.75rem' }}>
+      <p style={{ color: 'rgba(163,163,163,0.25)', fontSize: '.75rem', fontVariantNumeric: 'tabular-nums', marginTop: '.75rem' }}>
         {status}
       </p>
     </div>
   );
 }
 
-function Header({ online, offline, total }: { online: number; offline: number; total: number }) {
+function Header({ online, total }: { online: number; total: number }) {
   return (
     <div style={{ position: 'fixed', top: '1.25rem', left: '50%', transform: 'translateX(-50%)', zIndex: 10 }}>
       <nav style={{
         display: 'flex', alignItems: 'center', gap: '1.25rem',
         padding: '.5rem 1.25rem .5rem 1.5rem',
-        background: 'var(--mc-panel, rgba(12,14,12,0.82))', backdropFilter: 'blur(18px)',
-        border: '1px solid rgba(156,176,156,0.12)', borderRadius: 100, fontSize: '.8rem',
+        background: 'rgba(19,19,19,0.86)', backdropFilter: 'blur(18px)',
+        border: '1px solid rgba(163,163,163,0.12)', borderRadius: 100, fontSize: '.8rem',
       }}>
-        <span style={{ fontWeight: 500, color: 'var(--mc-ink, #c9d3c9)' }}>Manacitra</span>
-        <span style={{ color: 'rgba(201,211,201,0.18)' }}>·</span>
-        <span style={{ color: 'rgba(201,211,201,0.6)', display: 'flex', alignItems: 'center', gap: '.35rem' }}>
-          <span style={{ width: 5, height: 5, borderRadius: '50%', display: 'inline-block', background: 'var(--mc-lamp-on, #9dbf9a)' }} />
+        <span style={{ fontWeight: 500, color: '#e6e6e6' }}>Manacitra</span>
+        <span style={{ color: 'rgba(163,163,163,0.25)' }}>·</span>
+        <span style={{ color: 'rgba(163,163,163,0.7)', display: 'flex', alignItems: 'center', gap: '.35rem' }}>
+          <span style={{ width: 5, height: 5, borderRadius: '50%', display: 'inline-block', background: '#ffb454' }} />
           {online} lit
         </span>
-        <span style={{ color: offline ? 'rgba(201,211,201,0.6)' : 'rgba(201,211,201,0.28)', display: 'flex', alignItems: 'center', gap: '.35rem' }}>
-          <span style={{ width: 5, height: 5, borderRadius: '50%', display: 'inline-block', background: 'var(--mc-lamp-off, #566056)' }} />
-          {offline} dark
-        </span>
-        <span style={{ color: 'rgba(201,211,201,0.25)', fontSize: '.7rem' }}>{total} services</span>
+        <span style={{ color: 'rgba(163,163,163,0.4)', fontSize: '.7rem' }}>{total} services</span>
       </nav>
     </div>
   );
@@ -66,16 +62,21 @@ function TopBar() {
     <div style={{ position: 'fixed', top: '1.1rem', right: '1.25rem', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
       <button
         onClick={() => setOpen(o => !o)}
-        aria-label={open ? 'Close' : 'Search / tools'}
+        aria-label={open ? 'Close tools' : 'Open tools'}
         style={{
           width: 28, height: 28, borderRadius: '50%', cursor: 'pointer', fontFamily: 'inherit',
-          background: open ? 'rgba(156,176,156,0.12)' : 'transparent',
-          border: `1px solid ${open ? 'rgba(156,176,156,0.25)' : 'rgba(156,176,156,0.18)'}`,
-          color: 'rgba(201,211,201,0.55)', fontSize: '.8rem',
+          background: open ? 'rgba(163,163,163,0.12)' : 'transparent',
+          border: `1px solid ${open ? 'rgba(163,163,163,0.25)' : 'rgba(163,163,163,0.18)'}`,
+          color: 'rgba(163,163,163,0.7)', fontSize: '.8rem', lineHeight: 1,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}
-      >{open ? '×' : '⌕'}</button>
+      >{open ? '×' : '···'}</button>
       {open && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '10px 12px', background: 'var(--mc-panel, rgba(12,14,12,0.86))', backdropFilter: 'blur(18px)', border: '1px solid rgba(156,176,156,0.14)', borderRadius: 12 }}>
+        <div style={{
+          display: 'flex', flexDirection: 'column', gap: 10, padding: '10px 12px',
+          background: 'rgba(19,19,19,0.92)', backdropFilter: 'blur(18px)',
+          border: '1px solid rgba(163,163,163,0.14)', borderRadius: 12,
+        }}>
           <SearchBar />
           <div style={{ display: 'flex', gap: 8 }}><ContrastToggle /></div>
         </div>
@@ -89,109 +90,80 @@ export default function Manacitra() {
   const [progress, setProgress] = useState(5);
   const [status, setStatus] = useState('Loading data...');
   const [error, setError] = useState<string | null>(null);
+  const [plate, setPlate] = useState<{ html: string; world: any } | null>(null);
   const data = useManacitraStore(s => s.data);
   const setData = useManacitraStore(s => s.setData);
   const highContrast = useManacitraStore(s => s.highContrast);
+  const searchQuery = useManacitraStore(s => s.searchQuery);
   useReducedMotion();
-  const rootRef = useRef<HTMLDivElement>(null);
+  const plateRef = useRef<HTMLDivElement>(null);
+  const liveRef = useRef<{ select: (n: string) => void; clear: () => void; applyHealth: (d: any) => void; setQuery: (q: string) => void; destroy: () => void } | null>(null);
 
-  const { online, offline, total } = useMemo(() => {
-    if (!data) return { online: 0, offline: 0, total: 0 };
-    let on = 0, off = 0, t = 0;
-    const allIds = new Set<string>();
-    data.zones.forEach(z => z.services.forEach(s => allIds.add(s.id)));
-    allIds.forEach(id => {
+  const { online, total } = useMemo(() => {
+    if (!data) return { online: 0, total: 0 };
+    let on = 0, t = 0;
+    const ids = new Set<string>();
+    data.zones.forEach(z => z.services.forEach(s => ids.add(s.id)));
+    ids.forEach(id => {
       t++;
-      const h = data.health[id];
-      if (!h) return;
-      if (h.online) on++; else off++;
+      if (data.health[id]?.online) on++;
     });
-    return { online: on, offline: off, total: t };
+    return { online: on, total: t };
   }, [data]);
 
   useEffect(() => {
     fetch('/manacitra/data.json')
       .then(r => r.json())
-      .then((d: ManacitraData) => {
-        setProgress(50); setStatus('Building switchboard...');
+      .then(async (d: ManacitraData) => {
+        setProgress(40); setStatus('Building switchboard...');
         setData(d);
-        setProgress(85); setStatus('Finalizing...');
-        setTimeout(() => { setProgress(100); setStatus('Ready'); setLoaded(true); }, 200);
+        const [{ buildPlate }, keys] = await Promise.all([
+          import('./figure/plate.mjs'),
+          fetch('/manacitra/keys.json').then(r => r.ok ? r.json() : {}).catch(() => ({})),
+        ]);
+        setProgress(80); setStatus('Wiring lamps...');
+        setPlate(buildPlate(d, keys));
+        setProgress(100); setStatus('Ready');
+        setLoaded(true);
       })
       .catch(() => { setError('Could not load map data.'); setStatus('Error'); setLoaded(true); });
   }, [setData]);
 
+  // The plate is written into the container imperatively, never as React
+  // children: a re-render would otherwise replace the SVG and wipe the live
+  // layer's lamp and cord state.
   useEffect(() => {
-    if (!loaded || !data || !rootRef.current) return;
-    let cleanup;
+    if (!plate || !plateRef.current) return;
+    const host = plateRef.current;
+    host.innerHTML = plate.html;
+    let live: any = null;
     (async () => {
-      const [{ mountLive }, worldMod, keysMod] = await Promise.all([
-        import('./figure/live.mjs'),
-        import('./figure/world.mjs'),
-        fetch('/manacitra/keys.json').then(r => r.json()).catch(() => ({})),
-      ]);
-      const world = worldMod.buildWorld ? worldMod.buildWorld(data) : data;
-      const stage = rootRef.current.querySelector('.mc-stage') as HTMLElement;
-      // inject prebuilt SVG if present
-      if (stage && !stage.querySelector('svg')) {
-        try {
-          const html = await fetch('/manacitra/switchboard.html').then(r => r.text());
-          const m = html.match(/<div class="iso-stage[\s\S]*?<svg[\s\S]*?<\/svg>[\s\S]*?<\/div>/);
-          if (m) {
-            const tmp = document.createElement('div');
-            tmp.innerHTML = m[0];
-            const svg = tmp.querySelector('svg');
-            if (svg) {
-              svg.removeAttribute('width');
-              svg.removeAttribute('height');
-              stage.appendChild(svg);
-            }
-          }
-        } catch {}
-      }
-      const live = mountLive(rootRef.current as HTMLElement, world, data, { keys: keysMod, defaultReadout: `${online} of ${total} lamps lit` });
-      cleanup = live;
+      const { mountLive } = await import('./figure/live.mjs');
+      live = mountLive(host, plate.world, data, {
+        defaultReadout: `${online} of ${total} lamps lit`,
+      });
+      liveRef.current = live;
     })();
-    return () => { if (typeof cleanup === 'function') cleanup(); };
-  }, [loaded, data, online, total]);
+    return () => { live?.destroy?.(); liveRef.current = null; };
+  }, [plate, data, online, total]);
+
+  // search acts as "find a jack"
+  useEffect(() => {
+    if (searchQuery) liveRef.current?.setQuery(searchQuery);
+  }, [searchQuery]);
 
   return (
-    <div data-contrast={highContrast ? 'high' : 'normal'} style={{ width: '100vw', height: '100dvh', background: 'var(--mc-bg, #0e100d)', position: 'relative', overflow: 'hidden', color: 'var(--mc-ink, #c9d3c9)' }}>
+    <div className="iso" data-theme={highContrast ? 'light' : 'dark'} style={{ width: '100vw', height: '100dvh', background: 'var(--anatomy-page)', position: 'relative', overflow: 'auto' }}>
       {error ? (
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, color: 'var(--anatomy-text)' }}>
           <span>⚠ {error}</span>
-          <button onClick={() => window.location.reload()} style={{ padding: '8px 18px', borderRadius: 999, cursor: 'pointer', background: 'rgba(156,176,156,0.16)', color: '#c9d3c9', border: '1px solid rgba(156,176,156,0.24)' }}>Retry</button>
+          <button onClick={() => window.location.reload()} style={{ padding: '8px 18px', borderRadius: 999, cursor: 'pointer', background: 'var(--anatomy-strong)', color: 'var(--anatomy-page)', border: 'none' }}>Retry</button>
         </div>
       ) : !loaded && <Loader progress={progress} status={status} />}
-      <Header online={online} offline={offline} total={total} />
-      <TopBar />
-      {data && (
-        <div ref={rootRef} style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 64 }}>
-          <div className="mc-plate" style={{ transform: 'scale(0.98)' }}>
-            <link rel="stylesheet" href="/manacitra/iso.css" />
-            <style>{`
-              :root{--mc-bg:#0e100d;--mc-ink:#c9d3c9;--mc-panel:rgba(12,14,12,0.86);--mc-lamp-on:#9dbf9a;--mc-lamp-off:#566056;--mc-cord:#6f7b6f;--mc-cord-hot:#b9d9b6}
-              [data-contrast="high"]{--mc-bg:#050705;--mc-ink:#e6ede6;--mc-lamp-on:#c9f0c6;--mc-lamp-off:#3a423a}
-            `}</style>
-            <div className="iso-frame">
-              <div className="iso-card">
-                <div className="iso-meta">
-                  <div className="iso-title">Manacitra</div>
-                  <div className="iso-hint">Click a jack to trace a call</div>
-                </div>
-                <div className="iso-stage mc-stage" tabIndex={0} role="group" aria-label="Cord switchboard">
-                  {/* Figure injected at build time or via keys; live harness works against .station/.cord/.lamp */}
-                </div>
-                <div className="iso-foot">
-                  <div data-readout className="iso-readout">{online} of {total} lamps lit · {data.connections?.length || 0} cords</div>
-                  <div className="iso-key">
-                    <span className="mark lit">●</span> lamp lit · <span className="mark flat">●</span> lamp dark · <span className="mark line">—</span> cord
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      {loaded && !error && <Header online={online} total={total} />}
+      {loaded && !error && <TopBar />}
+      {plate && (
+        <div ref={plateRef} style={{ width: 'min(860px, 100% - 32px)', margin: '72px auto 96px' }} />
       )}
     </div>
   );

@@ -41,7 +41,7 @@ export const FIGURE_CSS = `
 .mc-focus{fill:none;stroke:var(--anatomy-blue);stroke-width:1;opacity:0;pointer-events:none}
 .station[data-focus] .mc-focus,.station[data-selected] .mc-focus{opacity:1}
 .station[data-selected] .mc-focus{stroke:var(--anatomy-strong)}
-.lamp-glow{opacity:0;pointer-events:none;transition:opacity .5s var(--anatomy-ease)}
+.lamp-glow{fill:var(--mc-lamp);opacity:0;pointer-events:none;transition:opacity .5s var(--anatomy-ease)}
 .station[data-state="on"] .lamp-glow{opacity:.5}
 .station[data-hop] .lamp-glow{opacity:.9}
 .lamp-lens>.iso-fill,.lamp-lens>.iso-top,.lamp-lens>.iso-shade{fill:var(--mc-lens-off)}
@@ -49,6 +49,8 @@ export const FIGURE_CSS = `
 .station[data-state="on"] .lamp-lens>.iso-top{fill:var(--mc-lens-top)}
 .station[data-state="on"] .lamp-lens>.iso-shade{fill:var(--mc-lens-shade)}
 .station[data-hop] .jack-ring>.iso-edge{stroke:var(--mc-lamp)}
+.jack{cursor:pointer}
+.jack[data-focus] .jack-ring>.iso-edge{stroke:var(--anatomy-blue);stroke-width:1.4}
 .cord .tb-body{transition:fill .5s var(--anatomy-ease)}
 .cord[data-hop] .tb-body{fill:var(--mc-cord-lit)}
 .cord[data-hop] .tb-shine{fill:var(--mc-cord-lit-shine)}
@@ -125,8 +127,10 @@ export function buildFigure(world, { P, A = null, R = null, settle = null, keys 
     out.push(solidPart(Fface(cx, lampZ, faceY), LENS, "hi", `lens.${svc.id}`, "lamp-lens"));
     st.holes.forEach((h, i) => {
       const F = Fface(h.x, h.z, faceY);
+      out.push(`<g class="jack" data-conn="${h.conn}">`);
       out.push(discPart(F, 0, JACK.puck, JACK.rIn, "faint", `puck.${svc.id}.${i}`, { crease: "none" }));
       out.push(ringPart(F, 0, JACK.depth, JACK.rIn, JACK.rOut, "hi", `ring.${svc.id}.${i}`, "jack-ring"));
+      out.push("</g>");
     });
     const plate = { x: cx - PLATE.w / 2, y: faceY, w: PLATE.w, d: PLATE.d, r: 0.8 };
     out.push(slabPart(plate, zc - 13, PLATE.h, "lo", `plate.${svc.id}`, 3, 0.2));
@@ -135,7 +139,8 @@ export function buildFigure(world, { P, A = null, R = null, settle = null, keys 
     const [hx1, hy1] = k.iso([cx + 14, faceY, zc + 15.5], P);
     const hit = `<rect class="mc-hit" x="${Math.min(hx0, hx1)}" y="${Math.min(hy0, hy1)}" width="${Math.abs(hx1 - hx0)}" height="${Math.abs(hy1 - hy0)}"/>`;
     const focus = `<rect class="mc-focus" x="${Math.min(hx0, hx1) - 1}" y="${Math.min(hy0, hy1) - 1}" width="${Math.abs(hx1 - hx0) + 2}" height="${Math.abs(hy1 - hy0) + 2}"/>`;
-    return `<g class="station" data-svc="${svc.id}" data-state="on">${out.join("")}${hit}${focus}</g>`;
+    const state = st.online ? "on" : "off";
+    return `<g class="station" data-svc="${svc.id}" data-node="${st.node}" data-state="${state}">${out.join("")}${hit}${focus}</g>`;
   };
 
   // --- line strip (zone trunk jacks) --------------------------------------------
@@ -146,8 +151,10 @@ export function buildFigure(world, { P, A = null, R = null, settle = null, keys 
     out.push(slabPart(plan, STRIP.z0, STRIP.z1 - STRIP.z0, "mid", `strip.${bay.zone.id}`, 3, 0.2));
     strip.holes.forEach((h, i) => {
       const F = Fface(h.x, h.z, STRIP.faceY);
+      out.push(`<g class="jack" data-conn="${h.conn}">`);
       out.push(discPart(F, 0, JACK.puck, JACK.rIn, "faint", `puck.${bay.zone.id}.${i}`, { crease: "none" }));
       out.push(ringPart(F, 0, JACK.depth, JACK.rIn, JACK.rOut, "hi", `ring.${bay.zone.id}.${i}`, "jack-ring"));
+      out.push("</g>");
     });
     return `<g class="strip" data-zone="${bay.zone.id}">${out.join("")}</g>`;
   };
@@ -243,28 +250,25 @@ export function buildFigure(world, { P, A = null, R = null, settle = null, keys 
     draw(`plug:${c.idx}:${side}`, [hole[0], face + 5, hole[2]], 0, () => solidPart(F, PLUG, "hi", `plug${c.idx}.${side}`));
   };
 
+  // Each cord is one route for the clearance and fold checks, but every short
+  // piece of it is its own drawn item: a long cord carries one depth key, and
+  // where two cords cross on screen no single key can order them.
   const cordSvg = (c) => {
     const filleted = G.fillet(c.route, 6.5, 10, { P, tube: CORD_R });
-    const total = G.pathLength(filleted);
-    const gap = [[Math.max(1, total / 2 - 0.4), Math.min(total - 1, total / 2 + 0.4)]];
-    const runs = A && R ? R.route(`cord${c.idx}`, filleted, CORD_R, { limp: true, gaps: gap }) : [];
-    const pieces = tubePieces(filleted, CORD_R, P, { maxLength: 22, spacing: 2.4, gaps: gap, caps: true });
-    const split = (gap[0][0] + gap[0][1]) / 2;
-    const halves = [
-      { sel: (pc) => pc.from < split, at: pieces.find((pc) => pc.from < split)?.mid ?? filleted[0] },
-      { sel: (pc) => pc.to > split, at: [...pieces].reverse().find((pc) => pc.to > split)?.mid ?? filleted.at(-1) },
-    ];
-    halves.forEach((half, i) => {
-      const halfSvg = pieces.filter(half.sel).map((pc) => tubeSvg(pc, { tone: "mid" })).join("");
-      if (!halfSvg) return;
+    const id = `cord${c.idx}`;
+    if (A && R) R.route(id, filleted, CORD_R, { limp: true });
+    const pieces = tubePieces(filleted, CORD_R, P, { maxLength: 14, spacing: 2.4, caps: true });
+    pieces.forEach((part, index) => {
+      const svg = tubeSvg(part, { tone: "mid" });
+      if (!svg) return;
       items.push({
-        piece: `cord:${c.idx}:${i}`,
-        at: half.at,
+        piece: `${id}:${index}`,
+        at: part.mid,
         bias: 0,
-        svg: `<g class="cord" data-conn="${c.idx}">${halfSvg}</g>`,
-        shapes: runs.slice(i, i + 1),
-        route: `cord${c.idx}`,
-        chunk: i,
+        svg: `<g class="cord" data-conn="${c.idx}">${svg}</g>`,
+        shapes: A && R ? [A.tube(part.points, part.radii)] : [],
+        route: id,
+        chunk: index,
       });
     });
   };
