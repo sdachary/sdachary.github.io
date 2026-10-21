@@ -99,6 +99,9 @@ export default function Manacitra() {
   const [host, setHost] = useState<HTMLDivElement | null>(null);
   const liveRef = useRef<any>(null);
   const dataRef = useRef<ManacitraData | null>(null);
+  // the roster is usable before the plate finishes building, so a click that
+  // lands in that window is remembered and applied once the board is live
+  const pendingPick = useRef<string | null>(null);
   const view = useViewport(host, PLATE_W, PLATE_H);
 
   const { online, total } = useMemo(() => {
@@ -149,6 +152,14 @@ export default function Manacitra() {
         onHealth: (h: Health) => setHealth(h),
       });
       liveRef.current = live;
+      if (pendingPick.current) {
+        const id = pendingPick.current;
+        pendingPick.current = null;
+        live.select(`svc:${id}`);
+        const p = live.pointOf(id);
+        if (p) view.centerOn(p[0], p[1], Math.max(view.view.scale, 2.2));
+        setSelected(id);
+      }
     })();
     return () => { live?.destroy?.(); liveRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -156,7 +167,11 @@ export default function Manacitra() {
 
   const pick = useCallback((id: string) => {
     const live = liveRef.current;
-    if (!live) return;
+    if (!live) {
+      pendingPick.current = id;
+      setSelected(id);
+      return;
+    }
     live.select(`svc:${id}`);
     const p = live.pointOf(id);
     if (p) view.centerOn(p[0], p[1], Math.max(view.view.scale, 2.2));
