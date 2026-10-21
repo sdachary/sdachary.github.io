@@ -39,8 +39,8 @@ export const FIGURE_CSS = `
 .mc-svg .station{cursor:pointer}
 .mc-hit{fill:transparent;stroke:none;pointer-events:all}
 .mc-focus{fill:none;stroke:var(--anatomy-blue);stroke-width:1;opacity:0;pointer-events:none}
-.station[data-focus] .mc-focus,.station[data-selected] .mc-focus{opacity:1}
-.station[data-selected] .mc-focus{stroke:var(--anatomy-strong)}
+.station[data-focus] .mc-focus,.station[data-selected] .mc-focus,.station[data-hover] .mc-focus{opacity:1}
+.station[data-selected] .mc-focus{stroke:var(--mc-lamp);stroke-width:1.3}
 .lamp-glow{fill:var(--mc-lamp);opacity:0;pointer-events:none;transition:opacity .5s var(--anatomy-ease)}
 .station[data-state="on"] .lamp-glow{opacity:.5}
 .station[data-hop] .lamp-glow{opacity:.9}

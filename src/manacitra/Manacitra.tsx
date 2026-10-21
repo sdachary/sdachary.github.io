@@ -1,9 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import ContrastToggle from './ui/ContrastToggle';
-import SearchBar from './ui/SearchBar';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import './manacitra.css';
+import ServiceRoster, { type Health } from './ui/ServiceRoster';
+import ServiceDetail from './ui/ServiceDetail';
+import { useViewport } from './controls/useViewport';
 import { useReducedMotion } from './a11y/useReducedMotion';
 import { useManacitraStore } from './store';
 import type { ManacitraData } from './types';
+
+const PLATE_W = 780;
+const PLATE_H = 560;
 
 function Loader({ progress, status }: { progress: number; status: string }) {
   return (
@@ -18,10 +23,9 @@ function Loader({ progress, status }: { progress: number; status: string }) {
         animation: 'spin 1.2s cubic-bezier(0.4,0,0.2,1) infinite',
         marginBottom: '2rem',
       }} />
-      <h1 style={{
-        fontSize: '2.5rem', fontWeight: 300, letterSpacing: '-0.02em',
-        color: '#a3a3a3', marginBottom: '.5rem',
-      }}>Manacitra</h1>
+      <h1 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '-0.02em', color: '#a3a3a3', marginBottom: '.5rem' }}>
+        Manacitra
+      </h1>
       <p style={{ color: 'rgba(163,163,163,0.35)', fontSize: '.8rem', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '.75rem' }}>
         Cord switchboard
       </p>
@@ -37,10 +41,10 @@ function Loader({ progress, status }: { progress: number; status: string }) {
 
 function Header({ online, total }: { online: number; total: number }) {
   return (
-    <div style={{ position: 'fixed', top: '1.25rem', left: '50%', transform: 'translateX(-50%)', zIndex: 10 }}>
+    <div style={{ position: 'fixed', top: '1.25rem', left: '1.25rem', zIndex: 10 }}>
       <nav style={{
-        display: 'flex', alignItems: 'center', gap: '1.25rem',
-        padding: '.5rem 1.25rem .5rem 1.5rem',
+        display: 'flex', alignItems: 'center', gap: '1rem',
+        padding: '.5rem 1.1rem',
         background: 'rgba(19,19,19,0.86)', backdropFilter: 'blur(18px)',
         border: '1px solid rgba(163,163,163,0.12)', borderRadius: 100, fontSize: '.8rem',
       }}>
@@ -56,31 +60,22 @@ function Header({ online, total }: { online: number; total: number }) {
   );
 }
 
-function TopBar() {
-  const [open, setOpen] = useState(false);
+function Tools({ query, onQuery, theme, onTheme }: {
+  query: string; onQuery: (q: string) => void; theme: string; onTheme: () => void;
+}) {
   return (
-    <div style={{ position: 'fixed', top: '1.1rem', right: '1.25rem', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
-      <button
-        onClick={() => setOpen(o => !o)}
-        aria-label={open ? 'Close tools' : 'Open tools'}
-        style={{
-          width: 28, height: 28, borderRadius: '50%', cursor: 'pointer', fontFamily: 'inherit',
-          background: open ? 'rgba(163,163,163,0.12)' : 'transparent',
-          border: `1px solid ${open ? 'rgba(163,163,163,0.25)' : 'rgba(163,163,163,0.18)'}`,
-          color: 'rgba(163,163,163,0.7)', fontSize: '.8rem', lineHeight: 1,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}
-      >{open ? '×' : '···'}</button>
-      {open && (
-        <div style={{
-          display: 'flex', flexDirection: 'column', gap: 10, padding: '10px 12px',
-          background: 'rgba(19,19,19,0.92)', backdropFilter: 'blur(18px)',
-          border: '1px solid rgba(163,163,163,0.14)', borderRadius: 12,
-        }}>
-          <SearchBar />
-          <div style={{ display: 'flex', gap: 8 }}><ContrastToggle /></div>
-        </div>
-      )}
+    <div className="mc-tools">
+      <input
+        type="search"
+        value={query}
+        onChange={(e) => onQuery(e.target.value)}
+        placeholder="Find a jack…"
+        aria-label="Find a jack"
+        className="mc-search"
+      />
+      <button onClick={onTheme} aria-label="Toggle light and dark plate" className="mc-icon-btn" title="Light / dark plate">
+        {theme === 'light' ? '◐' : '◑'}
+      </button>
     </div>
   );
 }
@@ -91,13 +86,20 @@ export default function Manacitra() {
   const [status, setStatus] = useState('Loading data...');
   const [error, setError] = useState<string | null>(null);
   const [plate, setPlate] = useState<{ html: string; world: any } | null>(null);
+  const [health, setHealth] = useState<Health>({});
+  const [selected, setSelected] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
   const data = useManacitraStore(s => s.data);
   const setData = useManacitraStore(s => s.setData);
   const highContrast = useManacitraStore(s => s.highContrast);
-  const searchQuery = useManacitraStore(s => s.searchQuery);
+  const setHighContrast = useManacitraStore(s => s.setHighContrast);
   useReducedMotion();
-  const plateRef = useRef<HTMLDivElement>(null);
-  const liveRef = useRef<{ select: (n: string) => void; clear: () => void; applyHealth: (d: any) => void; setQuery: (q: string) => void; destroy: () => void } | null>(null);
+
+  const [host, setHost] = useState<HTMLDivElement | null>(null);
+  const liveRef = useRef<any>(null);
+  const dataRef = useRef<ManacitraData | null>(null);
+  const view = useViewport(host, PLATE_W, PLATE_H);
 
   const { online, total } = useMemo(() => {
     if (!data) return { online: 0, total: 0 };
@@ -117,6 +119,8 @@ export default function Manacitra() {
       .then(async (d: ManacitraData) => {
         setProgress(40); setStatus('Building switchboard...');
         setData(d);
+        dataRef.current = d;
+        setHealth(d.health || {});
         const [{ buildPlate }, keys] = await Promise.all([
           import('./figure/plate.mjs'),
           fetch('/manacitra/keys.json').then(r => r.ok ? r.json() : {}).catch(() => ({})),
@@ -133,37 +137,103 @@ export default function Manacitra() {
   // children: a re-render would otherwise replace the SVG and wipe the live
   // layer's lamp and cord state.
   useEffect(() => {
-    if (!plate || !plateRef.current) return;
-    const host = plateRef.current;
+    if (!plate || !host) return;
     host.innerHTML = plate.html;
     let live: any = null;
     (async () => {
       const { mountLive } = await import('./figure/live.mjs');
-      live = mountLive(host, plate.world, data, {
+      live = mountLive(host, plate.world, dataRef.current, {
         defaultReadout: `${online} of ${total} lamps lit`,
+        onSelect: (id: string | null) => setSelected(id),
+        onHover: (id: string | null) => setHovered(id),
+        onHealth: (h: Health) => setHealth(h),
       });
       liveRef.current = live;
     })();
     return () => { live?.destroy?.(); liveRef.current = null; };
-  }, [plate, data, online, total]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plate, host]);
 
-  // search acts as "find a jack"
-  useEffect(() => {
-    if (searchQuery) liveRef.current?.setQuery(searchQuery);
-  }, [searchQuery]);
+  const pick = useCallback((id: string) => {
+    const live = liveRef.current;
+    if (!live) return;
+    live.select(`svc:${id}`);
+    const p = live.pointOf(id);
+    if (p) view.centerOn(p[0], p[1], Math.max(view.view.scale, 2.2));
+    setSelected(id);
+  }, [view]);
+
+  const onQuery = useCallback((q: string) => {
+    setQuery(q);
+    const live = liveRef.current;
+    if (!live || !q.trim()) return;
+    const id = live.setQuery(q);
+    if (id) {
+      const p = live.pointOf(id);
+      if (p) view.centerOn(p[0], p[1], Math.max(view.view.scale, 2.2));
+    }
+  }, [view]);
 
   return (
-    <div className="iso" data-theme={highContrast ? 'light' : 'dark'} style={{ width: '100vw', height: '100dvh', background: 'var(--anatomy-page)', position: 'relative', overflow: 'auto' }}>
+    <div
+      className="iso"
+      data-theme={highContrast ? 'light' : 'dark'}
+      style={{
+        '--mc-rail': '320px',
+        background: 'var(--anatomy-page)',
+        color: 'var(--anatomy-text)',
+        height: '100dvh',
+        overflow: 'hidden',
+        position: 'relative',
+      } as React.CSSProperties}
+    >
       {error ? (
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, color: 'var(--anatomy-text)' }}>
+        <div className="mc-error">
           <span>⚠ {error}</span>
-          <button onClick={() => window.location.reload()} style={{ padding: '8px 18px', borderRadius: 999, cursor: 'pointer', background: 'var(--anatomy-strong)', color: 'var(--anatomy-page)', border: 'none' }}>Retry</button>
+          <button onClick={() => window.location.reload()}>Retry</button>
         </div>
-      ) : !loaded && <Loader progress={progress} status={status} />}
+      ) : !loaded ? <Loader progress={progress} status={status} /> : null}
       {loaded && !error && <Header online={online} total={total} />}
-      {loaded && !error && <TopBar />}
-      {plate && (
-        <div ref={plateRef} style={{ width: 'min(860px, 100% - 32px)', margin: '72px auto 96px' }} />
+      {loaded && !error && (
+        <Tools
+          query={query}
+          onQuery={onQuery}
+          theme={highContrast ? 'light' : 'dark'}
+          onTheme={() => setHighContrast(!highContrast)}
+        />
+      )}
+
+      <div className="mc-body">
+        <div className="mc-stage-wrap">
+          <div className="mc-viewport" {...view.pointerHandlers}>
+            {plate && <div ref={setHost} className="mc-plate-host" />}
+          </div>
+          <div className="mc-zoom">
+            <button onClick={() => view.zoomBy(1 / 1.4)} aria-label="Zoom out">−</button>
+            <button onClick={() => view.reset()} aria-label="Fit the whole board">{Math.round(view.view.scale * 100)}%</button>
+            <button onClick={() => view.zoomBy(1.4)} aria-label="Zoom in">+</button>
+            <span className="mc-zoom-hint">scroll to zoom · drag to pan</span>
+          </div>
+          <p className="mc-legend">
+            <span><i className="mc-lamp" data-state="on" /> lit — service is up</span>
+            <span><i className="mc-lamp" data-state="off" /> dark — needs attention</span>
+            <span><i className="mc-legend-cord" /> a cord is a connection</span>
+          </p>
+        </div>
+
+        <ServiceRoster
+          data={data}
+          health={health}
+          selected={selected}
+          hovered={hovered}
+          onPick={pick}
+          onHover={(id) => { setHovered(id); liveRef.current?.mark(id); }}
+          query={query}
+        />
+      </div>
+
+      {selected && data && (
+        <ServiceDetail data={data} health={health} id={selected} onClose={() => { liveRef.current?.clear(); setSelected(null); }} />
       )}
     </div>
   );

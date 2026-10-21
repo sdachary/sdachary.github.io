@@ -8,7 +8,10 @@
 //   jack     <g class="jack" data-conn="<connection index>">
 //   cord     <g class="cord"  data-conn="<connection index>">
 //
-// mountLive(root, world, data, opts) → { select, clear, applyHealth, setQuery, destroy }
+// mountLive(root, world, data, opts) →
+//   { select, clear, hover, applyHealth, setQuery, pointOf, destroy }
+//
+// opts: onSelect(svcId|null)  onHover(svcId|null)  onHealth(health)  defaultReadout
 
 const STILL = "(prefers-reduced-motion: reduce)";
 const HOP_DELAY = 130;   // ms between hop levels, so a call lights plug to plug
@@ -40,7 +43,6 @@ export function mountLive(root, world, data, opts = {}) {
     if (node.startsWith("zone:")) return stage.querySelector(`.strip[data-zone="${node.slice(5)}"]`);
     return null;
   };
-  const cordEl = (idx) => stage.querySelector(`.cord[data-conn="${idx}"]`);
   const cordEls = (idx) => Array.from(stage.querySelectorAll(`.cord[data-conn="${idx}"]`));
 
   // service id → display name, for the readout
@@ -51,6 +53,7 @@ export function mountLive(root, world, data, opts = {}) {
   const jacks = () => Array.from(stage.querySelectorAll(".jack"));
 
   let selected = null;
+  let hovered = null;
   let tourTimer = 0;
   let tourIndex = 0;
   let idleTimer = 0;
@@ -66,6 +69,7 @@ export function mountLive(root, world, data, opts = {}) {
       el.removeAttribute("data-selected");
       el.style.transitionDelay = "";
     }
+    opts.onSelect?.(null);
   };
 
   // Light the route out of a node: the node itself, then every cord it holds,
@@ -80,8 +84,6 @@ export function mountLive(root, world, data, opts = {}) {
       el.style.transitionDelay = "0ms";
     }
 
-    // Zone strips are trunk buses: a cord into one is the end of that call, so
-    // the walk stops there instead of flooding every other jack on the bus.
     const seen = new Set([node]);
     let frontier = [node];
     for (let hop = 1; hop <= 2 && frontier.length; hop++) {
@@ -100,6 +102,8 @@ export function mountLive(root, world, data, opts = {}) {
             fe.setAttribute("data-hop", String(hop));
             fe.style.transitionDelay = `${hop * HOP_DELAY}ms`;
           }
+          // Zone strips are trunk buses: a cord into one is the end of that
+          // call, so the walk stops there instead of flooding the bus.
           if (!far.startsWith("zone:")) next.push(far);
         }
       }
@@ -111,6 +115,46 @@ export function mountLive(root, world, data, opts = {}) {
     const health = data?.health?.[svc];
     const state = health ? (health.online ? "online" : "offline") : "unchecked";
     say(`${label} · ${state} · ${seen.size - 1} hop${seen.size === 2 ? "" : "s"}`);
+    opts.onSelect?.(svc);
+  };
+
+  // The engraved nameplates on the plate are 3-unit type — a diagram, not a
+  // label. Hovering a jack shows the real name beside the cursor.
+  const tip = document.createElement("div");
+  tip.className = "mc-tip";
+  tip.setAttribute("aria-hidden", "true");
+  root.appendChild(tip);
+
+  const showTip = (svcId, x, y) => {
+    if (!svcId) {
+      tip.removeAttribute("data-on");
+      return;
+    }
+    const health = data?.health?.[svcId];
+    const state = health ? (health.online ? "online" : "offline") : "unchecked";
+    tip.textContent = `${nameOf.get(svcId) || svcId} · ${state}`;
+    tip.setAttribute("data-on", state);
+    const box = root.getBoundingClientRect();
+    tip.style.left = `${x - box.left}px`;
+    tip.style.top = `${y - box.top}px`;
+  };
+
+  // mark a service's jack as hovered without a tooltip (the rail hovers a row,
+  // the plate hovers a jack — the tooltip belongs to the pointer)
+  const mark = (svcId) => {
+    if (hovered === svcId) return;
+    for (const el of stage.querySelectorAll("[data-hover]")) el.removeAttribute("data-hover");
+    hovered = svcId;
+    if (svcId) {
+      const el = stage.querySelector(`.station[data-svc="${svcId}"]`);
+      if (el) el.setAttribute("data-hover", "");
+    }
+    opts.onHover?.(svcId);
+  };
+
+  const hover = (svcId, x, y) => {
+    mark(svcId);
+    showTip(svcId, x, y);
   };
 
   const applyHealth = (d) => {
@@ -119,6 +163,7 @@ export function mountLive(root, world, data, opts = {}) {
       const h = d.health[st.dataset.svc];
       st.dataset.state = h?.online ? "on" : "off";
     }
+    opts.onHealth?.(d.health);
   };
 
   // --- pointer ------------------------------------------------------------------
@@ -140,6 +185,23 @@ export function mountLive(root, world, data, opts = {}) {
     if (e.target.closest?.(".mc-stage")) clear();
   };
   stage.addEventListener("click", onPick);
+
+  const onMove = (e) => {
+    const station = e.target.closest?.(".station");
+    const jack = e.target.closest?.(".jack");
+    let svcId = null;
+    if (station) svcId = station.dataset.svc;
+    else if (jack) {
+      const c = connByIndex.get(Number(jack.dataset.conn));
+      if (c) {
+        const far = c.a.startsWith("svc:") ? c.a : c.b;
+        svcId = far.startsWith("svc:") ? far.slice(4) : null;
+      }
+    }
+    hover(svcId, e.clientX, e.clientY);
+  };
+  stage.addEventListener("pointermove", onMove);
+  stage.addEventListener("pointerleave", () => hover(null, 0, 0));
 
   // --- keyboard: arrows move between jacks, Enter traces, Escape clears ---------
   const ordered = () => {
@@ -182,15 +244,16 @@ export function mountLive(root, world, data, opts = {}) {
   // --- search: "find a jack" -----------------------------------------------------
   const setQuery = (q) => {
     const needle = String(q || "").trim().toLowerCase();
-    if (!needle) return;
+    if (!needle) return null;
     for (const st of stations()) {
       const id = st.dataset.svc;
       const name = (nameOf.get(id) || "").toLowerCase();
       if (id.toLowerCase().includes(needle) || name.includes(needle)) {
         select(st.dataset.node);
-        return;
+        return id;
       }
     }
+    return null;
   };
 
   // --- health poll ----------------------------------------------------------------
@@ -238,13 +301,24 @@ export function mountLive(root, world, data, opts = {}) {
   return {
     select,
     clear,
+    hover,
+    mark,
     applyHealth,
     setQuery,
+    // viewBox point of a service's lamp, so the page can centre on it
+    pointOf(svcId) {
+      const el = stage.querySelector(`.station[data-svc="${svcId}"]`);
+      if (!el) return null;
+      const b = el.getBBox();
+      return [b.x + b.width / 2, b.y + b.height / 2];
+    },
     destroy() {
       stopped = true;
       clearTimeout(pollTimer);
       stopTour();
       stage.removeEventListener("click", onPick);
+      stage.removeEventListener("pointermove", onMove);
+      tip.remove();
     },
   };
 }
