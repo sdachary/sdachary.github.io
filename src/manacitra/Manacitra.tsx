@@ -123,6 +123,7 @@ export default function Manacitra() {
 
   useEffect(() => {
     if (!loaded || !data || !rootRef.current) return;
+    let cleanup;
     (async () => {
       const [{ mountLive }, worldMod, keysMod] = await Promise.all([
         import('./figure/live.mjs'),
@@ -130,10 +131,29 @@ export default function Manacitra() {
         fetch('/manacitra/keys.json').then(r => r.json()).catch(() => ({})),
       ]);
       const world = worldMod.buildWorld ? worldMod.buildWorld(data) : data;
+      const stage = rootRef.current.querySelector('.mc-stage') as HTMLElement;
+      // inject prebuilt SVG if present
+      if (stage && !stage.querySelector('svg')) {
+        try {
+          const html = await fetch('/manacitra/switchboard.html').then(r => r.text());
+          const m = html.match(/<div class="iso-stage[\s\S]*?<svg[\s\S]*?<\/svg>[\s\S]*?<\/div>/);
+          if (m) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = m[0];
+            const svg = tmp.querySelector('svg');
+            if (svg) {
+              svg.removeAttribute('width');
+              svg.removeAttribute('height');
+              stage.appendChild(svg);
+            }
+          }
+        } catch {}
+      }
       const live = mountLive(rootRef.current as HTMLElement, world, data, { keys: keysMod, defaultReadout: `${online} of ${total} lamps lit` });
-      return live;
+      cleanup = live;
     })();
-  }, [loaded, data]);
+    return () => { if (typeof cleanup === 'function') cleanup(); };
+  }, [loaded, data, online, total]);
 
   return (
     <div data-contrast={highContrast ? 'high' : 'normal'} style={{ width: '100vw', height: '100dvh', background: 'var(--mc-bg, #0e100d)', position: 'relative', overflow: 'hidden', color: 'var(--mc-ink, #c9d3c9)' }}>
