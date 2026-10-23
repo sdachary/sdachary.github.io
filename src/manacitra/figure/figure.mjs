@@ -54,8 +54,19 @@ export const FIGURE_CSS = `
 .cord .tb-body{transition:fill .5s var(--anatomy-ease)}
 .cord[data-hop] .tb-body{fill:var(--mc-cord-lit)}
 .cord[data-hop] .tb-shine{fill:var(--mc-cord-lit-shine)}
-.iso{--mc-lamp:#ffb454;--mc-lens-on:#ffd9a0;--mc-lens-top:#fff0d8;--mc-lens-shade:#d99a4e;--mc-lens-off:#2e2e2e;--mc-cord:#3f3f3f;--mc-cord-lit:#ffb454;--mc-cord-lit-shine:#ffe2b8}
-.iso[data-theme="light"]{--mc-lamp:#c26a00;--mc-lens-on:#f0a53a;--mc-lens-top:#ffc879;--mc-lens-shade:#d08b2a;--mc-lens-off:#c9c9cc;--mc-cord:#8a8a8f;--mc-cord-lit:#c26a00;--mc-cord-lit-shine:#f0a53a}
+.iso[data-theme="light"] .cord .tb-body{fill:var(--mc-cord)}
+/* On the dark board a live cord glows; on the light board the same amber on
+   paper reads flat, so the light board shows current travelling instead: a
+   dashed centreline whose phase is continuous across every piece of one cord
+   (the per-piece delay carries the cumulative length), so it reads as one
+   unbroken run of light rather than a set of blinking segments. */
+.cord .tb-flow{fill:none;stroke:var(--mc-cord-flow);stroke-width:.55;stroke-linecap:round;stroke-dasharray:2.2 3.3;opacity:0;pointer-events:none}
+.iso[data-theme="light"] .cord .tb-flow{opacity:.9;animation:mc-flow var(--mc-flow-dur,2.2s) linear infinite}
+.iso[data-theme="light"] .cord[data-hop] .tb-flow{opacity:1;stroke:var(--mc-cord-lit-shine);stroke-width:.75;animation-duration:.9s}
+@keyframes mc-flow{to{stroke-dashoffset:-5.5}}
+@media (prefers-reduced-motion:reduce){.cord .tb-flow{animation:none;opacity:0}}
+.iso{--mc-lamp:#ffb454;--mc-lens-on:#ffd9a0;--mc-lens-top:#fff0d8;--mc-lens-shade:#d99a4e;--mc-lens-off:#2e2e2e;--mc-cord:#3f3f3f;--mc-cord-lit:#ffb454;--mc-cord-lit-shine:#ffe2b8;--mc-cord-flow:#ffd9a0}
+.iso[data-theme="light"]{--mc-lamp:#c26a00;--mc-lens-on:#f0a53a;--mc-lens-top:#ffc879;--mc-lens-shade:#d08b2a;--mc-lens-off:#c9c9cc;--mc-cord:#8a8a8f;--mc-cord-lit:#c26a00;--mc-cord-lit-shine:#f0a53a;--mc-cord-flow:#c26a00}
 `;
 
 export function computeCamera(world, width = WIDTH, height = HEIGHT) {
@@ -253,19 +264,41 @@ export function buildFigure(world, { P, A = null, R = null, settle = null, keys 
   // Each cord is one route for the clearance and fold checks, but every short
   // piece of it is its own drawn item: a long cord carries one depth key, and
   // where two cords cross on screen no single key can order them.
+  //
+  // The light-board flow line rides on those same pieces: its dash phase is
+  // offset by the cord's cumulative projected length (mod the dash pattern), so
+  // the run of light is continuous across the seams instead of restarting at
+  // every piece.
+  // the dash period must be shorter than one cord piece (~14 units), or a piece
+  // holds at most a single dash and the run of light looks like scattered dots
+  const FLOW_PERIOD = 5.5;  // dash 2.2 + gap 3.3, in plate units
+  const FLOW_SECONDS = 2.2;
+  const flowSvg = (flat, along) => {
+    if (!flat || flat.length < 2) return "";
+    const d = flat
+      .map(([x, y], i) => `${i ? "L" : "M"}${Math.round(x * 10) / 10} ${Math.round(y * 10) / 10}`)
+      .join("");
+    const delay = (-((along % FLOW_PERIOD) / FLOW_PERIOD) * FLOW_SECONDS).toFixed(3);
+    return `<path class="tb-flow" d="${d}" style="animation-delay:${delay}s"/>`;
+  };
   const cordSvg = (c) => {
     const filleted = G.fillet(c.route, 6.5, 10, { P, tube: CORD_R });
     const id = `cord${c.idx}`;
     if (A && R) R.route(id, filleted, CORD_R, { limp: true });
     const pieces = tubePieces(filleted, CORD_R, P, { maxLength: 14, spacing: 2.4, caps: true });
+    let along = 0;
     pieces.forEach((part, index) => {
       const svg = tubeSvg(part, { tone: "mid" });
       if (!svg) return;
+      const flow = flowSvg(part.flat, along);
+      for (let i = 1; i < part.flat.length; i++) {
+        along += Math.hypot(part.flat[i][0] - part.flat[i - 1][0], part.flat[i][1] - part.flat[i - 1][1]);
+      }
       items.push({
         piece: `${id}:${index}`,
         at: part.mid,
         bias: 0,
-        svg: `<g class="cord" data-conn="${c.idx}">${svg}</g>`,
+        svg: `<g class="cord" data-conn="${c.idx}">${svg}${flow}</g>`,
         shapes: A && R ? [A.tube(part.points, part.radii)] : [],
         route: id,
         chunk: index,

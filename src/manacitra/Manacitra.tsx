@@ -225,9 +225,9 @@ export default function Manacitra() {
           </div>
           <div className="mc-zoom">
             <button onClick={() => view.zoomBy(1 / 1.4)} aria-label="Zoom out">−</button>
-            <button onClick={() => view.reset()} aria-label="Fit the whole board">{Math.round(view.view.scale * 100)}%</button>
+            <button onClick={() => view.reset()} aria-label="Fit the whole board, straight on">{Math.round(view.view.scale * 100)}%</button>
             <button onClick={() => view.zoomBy(1.4)} aria-label="Zoom in">+</button>
-            <span className="mc-zoom-hint">scroll to zoom · drag to pan</span>
+            <span className="mc-zoom-hint">drag to turn · shift-drag to pan · scroll to zoom</span>
           </div>
           <p className="mc-legend">
             <span><i className="mc-lamp" data-state="on" /> lit — service is up</span>
