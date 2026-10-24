@@ -1,0 +1,20 @@
+# Weekly dependency PRs — minor/patch grouped, majors individual, security advisories
+# always separate. Added by the Oct-2026 patch sweep; see
+# wiki/plans/security-patch-sweep-2026-10.md (Wave 4).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      npm--:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3

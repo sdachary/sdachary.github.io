@@ -29,6 +29,11 @@ on:
       gitleaks-npx:
         type: boolean
         default: false
+      # Production dependencies only: dev-chain advisories (vite/wrangler/miniflare)
+      # must never block a deploy, but a high+ in a shipped dependency must.
+      audit-cmd:
+        type: string
+        default: 'npm audit --omit=dev --audit-level=high'
 
 # NOTE: no top-level `concurrency:` here — it is invalid on a `workflow_call`-only
 # reusable workflow and GitHub rejects the run with "workflow file issue" (no jobs
@@ -43,6 +48,10 @@ jobs:
           node-version: ${{ inputs.node-version }}
           cache: npm
       - run: ${{ inputs.install-cmd }}
+
+      - if: ${{ inputs.audit-cmd != '' }}
+        name: Dependency audit (prod, high+)
+        run: ${{ inputs.audit-cmd }}
 
       - if: ${{ !inputs.gitleaks-npx }}
         name: Gitleaks
