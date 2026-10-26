@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ModelApi } from './scene/Model3D';
+import { ISO_CSS } from '../iso/iso-kit.mjs';
 import './manacitra.css';
 
 // three.js only arrives with the model view; the map stays light to load
@@ -173,6 +174,10 @@ export default function Manacitra() {
         position: 'relative',
       } as React.CSSProperties}
     >
+      {/* the --anatomy-* board palette lives in the kit; without it every
+          var() in manacitra.css resolves to nothing and both themes read as
+          black-on-black. Scoped to .iso, so the rest of the portfolio is safe. */}
+      <style>{ISO_CSS}</style>
       {error ? (
         <div className="mc-error">
           <span>⚠ {error}</span>

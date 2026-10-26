@@ -1,4 +1,5 @@
 import { logoFor, type LogoDef } from '../logos';
+import { useManacitraStore } from '../store';
 
 // One mark per service. A real brand logo wins when simple-icons has one
 // (redis, pihole, tailscale, postgres…); otherwise a monoline type-glyph drawn
@@ -49,17 +50,53 @@ function Glyph({ k, size }: { k: GlyphKey; size: number }) {
   );
 }
 
-function Brand({ def, size }: { def: LogoDef; size: number }) {
+function Brand({ def, size, dark }: { def: LogoDef; size: number; dark: boolean }) {
   return (
     <svg width={size} height={size} viewBox={def.vb} aria-hidden="true" focusable="false">
-      <path d={def.d} fill={def.color} />
+      <path d={def.d} fill={tint(def.color, dark)} />
     </svg>
   );
 }
 
+// simple-icons ships each brand's own hex, and several of them are near-black
+// (notion #000000, github #181717, sentry #362D59) — invisible on the #0b0b0b
+// board. Measure that properly with the WCAG contrast ratio against the board
+// rather than raw brightness (bright red scores low on brightness but reads
+// fine), and lift only what falls short, blending toward white so the brand hue
+// survives. Light board keeps every mark as its true brand color.
+const BOARD = { r: 11, g: 11, b: 11 }; // #0b0b0b, --anatomy-page on the dark board
+const MIN_CONTRAST = 4.5;
+
+const lin = (c: number) => { const s = c / 255; return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; };
+const relLum = ({ r, g, b }: { r: number; g: number; b: number }) =>
+  0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+const contrast = (a: { r: number; g: number; b: number }, b: { r: number; g: number; b: number }) => {
+  const [hi, lo] = [relLum(a), relLum(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+};
+const hexOf = ({ r, g, b }: { r: number; g: number; b: number }) =>
+  '#' + [r, g, b].map(c => Math.round(c).toString(16).padStart(2, '0')).join('');
+
+export function tint(hex: string, dark: boolean): string {
+  if (!dark) return hex;
+  const m = /^#([0-9a-f]{6})$/i.exec(hex);
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  const c = { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+  if (contrast(c, BOARD) >= MIN_CONTRAST) return hex;
+  // walk toward white until the mark clears the bar; black ends up a light grey,
+  // a dark brand red keeps its hue and just gains enough lift to read.
+  for (let k = 0; k < 1.0001; k += 1 / 32) {
+    const t = { r: c.r + (255 - c.r) * k, g: c.g + (255 - c.g) * k, b: c.b + (255 - c.b) * k };
+    if (contrast(t, BOARD) >= MIN_CONTRAST) return hexOf(t);
+  }
+  return '#ffffff';
+}
+
 export default function ServiceIcon({ svc, size = 14 }: { svc: { type: string; logo?: string }; size?: number }) {
+  const dark = !useManacitraStore(s => s.highContrast);
   const def = svc.logo ? logoFor(svc.logo) : null;
-  if (def) return <Brand def={def} size={size} />;
+  if (def) return <Brand def={def} size={size} dark={dark} />;
   const key = GLYPH[svc.logo ?? ''] ?? GLYPH[svc.type] ?? 'box';
   return <Glyph k={key} size={size} />;
 }
