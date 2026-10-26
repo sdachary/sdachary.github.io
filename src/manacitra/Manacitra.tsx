@@ -1,5 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ModelApi } from './scene/Model3D';
 import './manacitra.css';
+
+// three.js only arrives with the model view; the plate stays light to load
+const Model3D = lazy(() => import('./scene/Model3D'));
 import ServiceRoster, { type Health } from './ui/ServiceRoster';
 import ServiceDetail from './ui/ServiceDetail';
 import { useViewport } from './controls/useViewport';
@@ -60,11 +64,16 @@ function Header({ online, total }: { online: number; total: number }) {
   );
 }
 
-function Tools({ query, onQuery, theme, onTheme }: {
+function Tools({ query, onQuery, theme, onTheme, view, onView }: {
   query: string; onQuery: (q: string) => void; theme: string; onTheme: () => void;
+  view: string; onView: (v: 'plate' | 'model') => void;
 }) {
   return (
     <div className="mc-tools">
+      <div className="mc-view-switch" role="group" aria-label="Choose a view of the board">
+        <button data-on={view === 'plate'} aria-pressed={view === 'plate'} onClick={() => onView('plate')}>Board</button>
+        <button data-on={view === 'model'} aria-pressed={view === 'model'} onClick={() => onView('model')}>Model</button>
+      </div>
       <input
         type="search"
         value={query}
@@ -89,6 +98,7 @@ export default function Manacitra() {
   const [health, setHealth] = useState<Health>({});
   const [selected, setSelected] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
+  const [tip, setTip] = useState<{ x: number; y: number } | null>(null);
   const [query, setQuery] = useState('');
   const data = useManacitraStore(s => s.data);
   const setData = useManacitraStore(s => s.setData);
@@ -96,13 +106,17 @@ export default function Manacitra() {
   const setHighContrast = useManacitraStore(s => s.setHighContrast);
   useReducedMotion();
 
+  const [view, setView] = useState<'plate' | 'model'>(() => localStorage.getItem('manacitra_view') === 'model' ? 'model' : 'plate');
+  const viewRef = useRef(view);
+  viewRef.current = view;
   const [host, setHost] = useState<HTMLDivElement | null>(null);
   const liveRef = useRef<any>(null);
+  const modelRef = useRef<ModelApi | null>(null);
   const dataRef = useRef<ManacitraData | null>(null);
   // the roster is usable before the plate finishes building, so a click that
   // lands in that window is remembered and applied once the board is live
   const pendingPick = useRef<string | null>(null);
-  const view = useViewport(host, PLATE_W, PLATE_H);
+  const viewport = useViewport(host, PLATE_W, PLATE_H);
 
   const { online, total } = useMemo(() => {
     if (!data) return { online: 0, total: 0 };
@@ -147,8 +161,10 @@ export default function Manacitra() {
       const { mountLive } = await import('./figure/live.mjs');
       live = mountLive(host, plate.world, dataRef.current, {
         defaultReadout: `${online} of ${total} lamps lit`,
-        onSelect: (id: string | null) => setSelected(id),
-        onHover: (id: string | null) => setHovered(id),
+        // the plate stays mounted (and its idle tour keeps ticking) while the
+        // model is shown — it must not steer the page at all from there
+        onSelect: (id: string | null) => { if (viewRef.current === 'plate') setSelected(id); },
+        onHover: (id: string | null) => { if (viewRef.current === 'plate') setHovered(id); },
         onHealth: (h: Health) => setHealth(h),
       });
       liveRef.current = live;
@@ -157,7 +173,7 @@ export default function Manacitra() {
         pendingPick.current = null;
         live.select(`svc:${id}`);
         const p = live.pointOf(id);
-        if (p) view.centerOn(p[0], p[1], Math.max(view.view.scale, 2.2));
+        if (p) viewport.centerOn(p[0], p[1], Math.max(viewport.view.scale, 2.2));
         setSelected(id);
       }
     })();
@@ -166,6 +182,11 @@ export default function Manacitra() {
   }, [plate, host]);
 
   const pick = useCallback((id: string) => {
+    if (view === 'model') {
+      modelRef.current?.focus(id);
+      setSelected(id);
+      return;
+    }
     const live = liveRef.current;
     if (!live) {
       pendingPick.current = id;
@@ -174,20 +195,30 @@ export default function Manacitra() {
     }
     live.select(`svc:${id}`);
     const p = live.pointOf(id);
-    if (p) view.centerOn(p[0], p[1], Math.max(view.view.scale, 2.2));
+    if (p) viewport.centerOn(p[0], p[1], Math.max(viewport.view.scale, 2.2));
     setSelected(id);
   }, [view]);
 
+  const stateOf = (id: string) => (health[id] ? (health[id].online ? 'online' : 'offline') : 'unchecked');
+
   const onQuery = useCallback((q: string) => {
     setQuery(q);
+    const needle = q.trim().toLowerCase();
+    if (!needle) return;
+    if (view === 'model') {
+      const hit = (data?.zones.flatMap((z) => z.services) ?? [])
+        .find((sv) => sv.name.toLowerCase().includes(needle) || sv.id.includes(needle));
+      if (hit) { modelRef.current?.focus(hit.id); setSelected(hit.id); }
+      return;
+    }
     const live = liveRef.current;
-    if (!live || !q.trim()) return;
+    if (!live) return;
     const id = live.setQuery(q);
     if (id) {
       const p = live.pointOf(id);
-      if (p) view.centerOn(p[0], p[1], Math.max(view.view.scale, 2.2));
+      if (p) viewport.centerOn(p[0], p[1], Math.max(viewport.view.scale, 2.2));
     }
-  }, [view]);
+  }, [data, view]);
 
   return (
     <div
@@ -215,20 +246,49 @@ export default function Manacitra() {
           onQuery={onQuery}
           theme={highContrast ? 'light' : 'dark'}
           onTheme={() => setHighContrast(!highContrast)}
+          view={view}
+          onView={(v) => { setView(v); localStorage.setItem('manacitra_view', v); }}
         />
       )}
 
       <div className="mc-body">
-        <div className="mc-stage-wrap">
-          <div className="mc-viewport" {...view.pointerHandlers}>
+        <div className="mc-stage-wrap" data-view={view}>
+          {/* The plate stays mounted underneath the model: re-building 1.18 MB of SVG
+              on every switch would make the toggle feel expensive. */}
+          <div className="mc-viewport" style={{ display: view === 'plate' ? undefined : 'none' }} {...viewport.pointerHandlers}>
             {plate && <div ref={setHost} className="mc-plate-host" />}
           </div>
-          <div className="mc-zoom">
-            <button onClick={() => view.zoomBy(1 / 1.4)} aria-label="Zoom out">−</button>
-            <button onClick={() => view.reset()} aria-label="Fit the whole board, straight on">{Math.round(view.view.scale * 100)}%</button>
-            <button onClick={() => view.zoomBy(1.4)} aria-label="Zoom in">+</button>
+          {view === 'model' && (
+            <Suspense fallback={<div className="mc-3d-loading">Building the model…</div>}>
+              <Model3D
+                data={data}
+                health={health}
+                selected={selected}
+                hovered={hovered}
+                theme={highContrast ? 'light' : 'dark'}
+                onSelect={(id) => { if (id) pick(id); else { setSelected(null); } }}
+                onHover={(id, x, y) => { setHovered(id); if (x !== undefined && y !== undefined) setTip({ x, y }); }}
+                onReady={(api) => { modelRef.current = api; }}
+              />
+            </Suspense>
+          )}
+          {view === 'model' && hovered && tip && (
+            <div className="mc-tip" data-on={stateOf(hovered)} style={{ position: 'fixed', left: tip.x, top: tip.y }}>
+              {data?.zones.flatMap((z) => z.services).find((sv) => sv.id === hovered)?.name || hovered}
+              {' · '}{stateOf(hovered)}
+            </div>
+          )}
+          <div className="mc-zoom" style={{ display: view === 'plate' ? undefined : 'none' }}>
+            <button onClick={() => viewport.zoomBy(1 / 1.4)} aria-label="Zoom out">−</button>
+            <button onClick={() => viewport.reset()} aria-label="Fit the whole board, straight on">{Math.round(viewport.view.scale * 100)}%</button>
+            <button onClick={() => viewport.zoomBy(1.4)} aria-label="Zoom in">+</button>
             <span className="mc-zoom-hint">drag to turn · shift-drag to pan · scroll to zoom</span>
           </div>
+          {view === 'model' && (
+            <span className="mc-zoom mc-model-hint">
+              <span className="mc-zoom-hint">drag to turn · scroll to zoom · click a jack to trace</span>
+            </span>
+          )}
           <p className="mc-legend">
             <span><i className="mc-lamp" data-state="on" /> lit — service is up</span>
             <span><i className="mc-lamp" data-state="off" /> dark — needs attention</span>

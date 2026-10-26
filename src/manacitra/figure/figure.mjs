@@ -69,7 +69,9 @@ export const FIGURE_CSS = `
 .iso[data-theme="light"]{--mc-lamp:#c26a00;--mc-lens-on:#f0a53a;--mc-lens-top:#ffc879;--mc-lens-shade:#d08b2a;--mc-lens-off:#c9c9cc;--mc-cord:#8a8a8f;--mc-cord-lit:#c26a00;--mc-cord-lit-shine:#f0a53a;--mc-cord-flow:#c26a00}
 `;
 
-export function computeCamera(world, width = WIDTH, height = HEIGHT) {
+// `azimuth`/`elevation` let the same plate be seen from anywhere: the geometry
+// is genuinely 3D, so a different camera is a different drawing, not a skew.
+export function computeCamera(world, width = WIDTH, height = HEIGHT, { azimuth = 45, elevation = ELEVATION } = {}) {
   const pts = [
     ...k.boxCorners(DESK, -6, DESK.top),
     ...k.boxCorners({ x: BOX.x, y: BOX.y, w: BOX.w, d: BOX.d, r: BOX.r }, 0, BOX.top + 2),
@@ -80,7 +82,7 @@ export function computeCamera(world, width = WIDTH, height = HEIGHT) {
     pts.push(...k.boxCorners({ x: bay.x0 - 6, y: PANEL.y - 6, w: bay.w + 12, d: PANEL.d + 14, r: 3 }, 0, 136));
   }
   for (const c of world.conns) pts.push(...c.route);
-  return k.fitProjection(pts, width, height, { pad: 34, azimuth: 45, elevation: ELEVATION });
+  return k.fitProjection(pts, width, height, { pad: 34, azimuth, elevation });
 }
 
 export function buildFigure(world, { P, A = null, R = null, settle = null, keys = null } = {}) {

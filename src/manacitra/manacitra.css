@@ -337,6 +337,29 @@
   padding: 2px 5px;
 }
 
+/* --- the model view ---------------------------------------------------------- */
+.mc-3d { position: absolute; inset: 0; z-index: 1; }
+.mc-3d canvas { display: block; }
+.mc-3d-labels { z-index: 4; }
+.mc-3d-tier {
+  font: 500 10px/1 var(--anatomy-mono, ui-monospace, monospace);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--anatomy-muted);
+  transform: translateY(-6px);
+  white-space: nowrap;
+}
+.iso[data-theme="light"] .mc-3d-tier { color: #8a8a8f; }
+.mc-3d-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 400 12px var(--anatomy-mono, ui-monospace, monospace);
+  color: var(--anatomy-muted);
+}
+
 /* --- search + theme --------------------------------------------------------- */
 .mc-tools {
   position: fixed;
@@ -347,6 +370,35 @@
   gap: 8px;
   align-items: center;
 }
+
+.mc-view-switch {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(19, 19, 19, 0.86);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(163, 163, 163, 0.16);
+}
+.iso[data-theme="light"] .mc-view-switch {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.14);
+}
+.mc-view-switch button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font: 500 11.5px/1 var(--anatomy-mono, ui-monospace, monospace);
+  letter-spacing: 0.04em;
+  color: var(--anatomy-muted);
+}
+.mc-view-switch button[data-on] { background: rgba(163, 163, 163, 0.18); color: var(--anatomy-strong); }
+.iso[data-theme="light"] .mc-view-switch button[data-on] { background: rgba(0, 0, 0, 0.08); }
+
+/* the model carries its own controls, so this is only the hint pill */
+.mc-model-hint { pointer-events: none; }
 .mc-search {
   width: 200px;
   padding: 7px 12px;
@@ -410,4 +462,5 @@
   .mc-zoom-hint { display: none; }
   .mc-tools { top: 4.4rem; right: 1rem; left: 1rem; }
   .mc-search { flex: 1; width: auto; }
+  .mc-view-switch { flex: none; }
 }
