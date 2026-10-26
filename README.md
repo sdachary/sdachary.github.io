@@ -7,7 +7,7 @@
 | Path | Content |
 |------|---------|
 | `/` | Homepage SPA — Hero, About, Experience, Projects, Mānacitra embed (iframe), Contact, legal footer links |
-| `/manacitra.html` | Mānacitra infrastructure map — an isometric cord switchboard (one jack + lamp per service, one patch cord per connection, lamp state = health); two views of one board: the **plate** (tilt, zoom, searchable roster) and a **real 3D model** (three.js — drag to orbit, scroll to zoom, click a jack to trace its cords); on the light board the cords carry an animated flow; embedded on the homepage |
+| `/manacitra.html` | Mānacitra infrastructure map — an isometric cord switchboard (one jack + lamp per service, one patch cord per connection, lamp state = health); three views of one board: the **plate** (tilt, zoom, searchable roster), a **real 3D model** (three.js — drag to orbit, scroll to zoom, click a jack to trace its cords), and a **2D tier map** (five labelled tiers, one labelled curve per connection); on the light board the cords carry an animated flow; embedded on the homepage |
 | `/floweditor.html` | Internal React Flow editor for the map (admin only, no public link) |
 | `/privacy.html` | DPDP privacy notice |
 | `/terms.html` | Terms of Service |
