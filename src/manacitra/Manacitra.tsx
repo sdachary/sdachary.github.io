@@ -9,7 +9,7 @@ import ServiceRoster, { type Health } from './ui/ServiceRoster';
 import TierMap from './ui/TierMap';
 import ServiceDetail from './ui/ServiceDetail';
 import { useReducedMotion } from './a11y/useReducedMotion';
-import { useManacitraStore } from './store';
+import { useManacitraStore, embedded } from './store';
 import type { ManacitraData } from './types';
 
 type ViewMode = 'model' | 'map';
@@ -82,9 +82,13 @@ function Tools({ query, onQuery, theme, onTheme, view, onView }: {
         aria-label="Find a service"
         className="mc-search"
       />
-      <button onClick={onTheme} aria-label="Toggle light and dark plate" className="mc-icon-btn" title="Light / dark plate">
-        {theme === 'light' ? '◐' : '◑'}
-      </button>
+      {/* embedded, the portfolio's toggle is the only one — ours would be a
+          second switch that cannot reach it */}
+      {!embedded && (
+        <button onClick={onTheme} aria-label="Toggle light and dark plate" className="mc-icon-btn" title="Light / dark plate">
+          {theme === 'light' ? '◐' : '◑'}
+        </button>
+      )}
     </div>
   );
 }
