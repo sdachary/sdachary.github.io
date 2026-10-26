@@ -25,6 +25,13 @@ const GLYPH: Record<string, GlyphKey> = {
 
 export type GlyphKey = keyof typeof PATHS;
 
+// the drawn mark for a service — brand logo if simple-icons has one, else the
+// type glyph. Shared with the 3D model, which screen-prints the same marks.
+export const glyphFor = (svc: { type: string; logo?: string }): GlyphKey =>
+  GLYPH[svc.logo ?? ''] ?? GLYPH[svc.type] ?? 'box';
+
+export { PATHS as GLYPH_PATHS };
+
 // monoline, 24×24, single stroke path each
 const PATHS: Record<string, string> = {
   database: 'M5 7c0-1.7 3.1-3 7-3s7 1.3 7 3-3.1 3-7 3-7-1.3-7-3Zm0 0v10c0 1.7 3.1 3 7 3s7-1.3 7-3V7M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3',
@@ -97,6 +104,5 @@ export default function ServiceIcon({ svc, size = 14 }: { svc: { type: string; l
   const dark = !useManacitraStore(s => s.highContrast);
   const def = svc.logo ? logoFor(svc.logo) : null;
   if (def) return <Brand def={def} size={size} dark={dark} />;
-  const key = GLYPH[svc.logo ?? ''] ?? GLYPH[svc.type] ?? 'box';
-  return <Glyph k={key} size={size} />;
+  return <Glyph k={glyphFor(svc)} size={size} />;
 }
