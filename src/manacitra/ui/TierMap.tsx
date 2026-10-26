@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { ManacitraData } from '../types';
+import ServiceIcon from './ServiceIcon';
 
 // The reading surface: the same topology as five labelled tier columns, one
 // pill per service, one curve per connection. Plain SVG — no layout engine, no
@@ -144,8 +145,9 @@ export default function TierMap({ data, health, selected, hovered, onSelect, onH
                   >
                     <title>{svc.name}{on === undefined ? '' : on ? ' · online' : ' · offline'}</title>
                     <rect width={COL_W} height={26} rx={13} />
-                    <circle className="mc-map-lamp" data-on={on ? '' : on === false ? 'off' : undefined} cx={14} cy={13} r={4} />
-                    <text x={26} y={17}>{svc.name}</text>
+                    <circle className="mc-map-lamp" data-on={on ? '' : on === false ? 'off' : undefined} cx={12} cy={13} r={4} />
+                    <g className="mc-map-icon" transform="translate(23, 6)"><ServiceIcon svc={svc} size={14} /></g>
+                    <text x={41} y={17}>{svc.name}</text>
                   </g>
                 );
               })}

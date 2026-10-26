@@ -82,9 +82,16 @@ if (Array.isArray(data.zones)) {
     if ((data.stats || {})[k] !== v) fail(`stats.${k} = ${data.stats[k]}, recomputed = ${v}`);
   }
 
-  // 6. logos restricted to the known glyph set (no invented icons)
+  // 6. logos restricted to the known glyph set (no invented icons). The set is
+  //    the brand logos in logos.ts PLUS the type-glyphs ServiceIcon draws from a
+  //    service's `type` (and a few special `logo` hints) — both are drawn marks,
+  //    not invented icons, so neither should warn.
   const logosFile = path.join(ROOT, 'src/manacitra/logos.ts');
-  const known = new Set();
+  const known = new Set([
+    // keep in sync with src/manacitra/ui/ServiceIcon.tsx
+    'database', 'cache', 'api', 'app', 'service', 'saas', 'auth', 'security',
+    'dns', 'network', 'monitoring', 'host', 'ai', 'mail', 'terminal', 'scm',
+  ]);
   if (fs.existsSync(logosFile)) {
     const src = fs.readFileSync(logosFile, 'utf8');
     for (const m of src.matchAll(/^\s*([A-Za-z0-9_]+):\s*\{\s*color:/gm)) known.add(m[1]);
@@ -94,7 +101,9 @@ if (Array.isArray(data.zones)) {
   }
   if (known.size) {
     for (const s of services) {
-      if (s.logo && !known.has(s.logo)) warn(`service "${s.id}" logo "${s.logo}" not in glyph set — will render text-only`);
+      if (s.logo && !known.has(s.logo) && !known.has(s.type)) {
+        warn(`service "${s.id}" logo "${s.logo}" (type "${s.type}") not in glyph set — will render text-only`);
+      }
     }
   }
 

@@ -14,46 +14,6 @@
   min-width: 0;
 }
 
-.mc-viewport {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  cursor: grab;
-  touch-action: none;
-}
-.mc-viewport:active { cursor: grabbing; }
-
-/* the kit's figure frame is stripped back: the drawing is the page, the
-   corner marks float over it, and the caption is replaced by our own legend */
-.mc-plate-host,
-.mc-plate-host .iso-figure,
-.mc-plate-host .iso-plate {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  padding: 0;
-  background: none;
-  border: 0;
-  box-shadow: none;
-}
-.mc-plate-host .iso-stage {
-  position: absolute;
-  inset: 0;
-}
-.mc-plate-host .iso-svg {
-  width: 100%;
-  height: 100%;
-  transform-origin: 50% 50%;
-  will-change: transform;
-}
-.mc-plate-host .iso-legend { display: none; }
-.mc-plate-host .iso-plate-corners { z-index: 3; }
-/* the header and the search box already say "Fig / Manacitra / what to do" —
-   the plate keeps only the live readout corner */
-.mc-plate-host .iso-plate-corner[data-corner="fig"],
-.mc-plate-host .iso-plate-corner[data-corner="title"],
-.mc-plate-host .iso-plate-corner[data-corner="hint"] { display: none; }
-
 .mc-lamp {
   width: 7px;
   height: 7px;
@@ -241,6 +201,10 @@
 }
 .mc-row:focus-visible { outline: 2px solid var(--anatomy-blue); outline-offset: -2px; }
 .mc-row-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mc-row-icon { display: flex; color: var(--anatomy-muted); flex: none; }
+.mc-row:hover .mc-row-icon,
+.mc-row[data-hovered] .mc-row-icon,
+.mc-row[data-selected] .mc-row-icon { color: var(--anatomy-strong); }
 .mc-row-type {
   font: 400 10.5px/1 var(--anatomy-mono, ui-monospace, monospace);
   letter-spacing: 0.06em;
@@ -270,6 +234,13 @@
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16);
 }
 .mc-detail-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.mc-detail-id { display: flex; align-items: flex-start; gap: 0.6rem; }
+.mc-detail-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; border-radius: 9px; flex: none;
+  background: rgba(163, 163, 163, 0.09); color: var(--anatomy-text);
+}
+.iso[data-theme="light"] .mc-detail-icon { background: rgba(0, 0, 0, 0.05); }
 .mc-detail-name { font: 500 1.05rem/1.25 var(--anatomy-sans, system-ui, sans-serif); color: var(--anatomy-strong); }
 .mc-detail-sub {
   margin-top: 3px;
@@ -387,6 +358,10 @@
 .iso[data-theme="light"] .mc-map-lamp { fill: #c9c9cc; }
 .iso[data-theme="light"] .mc-map-lamp[data-on] { fill: #c26a00; }
 .iso[data-theme="light"] .mc-map-lamp[data-on="off"] { fill: #b4b4b8; stroke: rgba(0, 0, 0, 0.2); }
+.mc-map-icon { color: var(--anatomy-muted); pointer-events: none; }
+.mc-map-svc[data-hovered] .mc-map-icon,
+.mc-map-svc[data-selected] .mc-map-icon { color: var(--anatomy-strong); }
+.iso[data-theme="light"] .mc-map-icon { color: #6b6b6b; }
 
 .mc-map-wire {
   fill: none;

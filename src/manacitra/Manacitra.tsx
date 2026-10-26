@@ -2,20 +2,16 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import type { ModelApi } from './scene/Model3D';
 import './manacitra.css';
 
-// three.js only arrives with the model view; the plate stays light to load
+// three.js only arrives with the model view; the map stays light to load
 const Model3D = lazy(() => import('./scene/Model3D'));
 import ServiceRoster, { type Health } from './ui/ServiceRoster';
 import TierMap from './ui/TierMap';
 import ServiceDetail from './ui/ServiceDetail';
-import { useViewport } from './controls/useViewport';
 import { useReducedMotion } from './a11y/useReducedMotion';
 import { useManacitraStore } from './store';
 import type { ManacitraData } from './types';
 
-type ViewMode = 'plate' | 'model' | 'map';
-
-const PLATE_W = 780;
-const PLATE_H = 560;
+type ViewMode = 'model' | 'map';
 
 function Loader({ progress, status }: { progress: number; status: string }) {
   return (
@@ -74,7 +70,6 @@ function Tools({ query, onQuery, theme, onTheme, view, onView }: {
   return (
     <div className="mc-tools">
       <div className="mc-view-switch" role="group" aria-label="Choose a view of the board">
-        <button data-on={view === 'plate'} aria-pressed={view === 'plate'} onClick={() => onView('plate')}>Board</button>
         <button data-on={view === 'model'} aria-pressed={view === 'model'} onClick={() => onView('model')}>Model</button>
         <button data-on={view === 'map'} aria-pressed={view === 'map'} onClick={() => onView('map')}>Map</button>
       </div>
@@ -82,8 +77,8 @@ function Tools({ query, onQuery, theme, onTheme, view, onView }: {
         type="search"
         value={query}
         onChange={(e) => onQuery(e.target.value)}
-        placeholder="Find a jack…"
-        aria-label="Find a jack"
+        placeholder="Find a service…"
+        aria-label="Find a service"
         className="mc-search"
       />
       <button onClick={onTheme} aria-label="Toggle light and dark plate" className="mc-icon-btn" title="Light / dark plate">
@@ -98,7 +93,6 @@ export default function Manacitra() {
   const [progress, setProgress] = useState(5);
   const [status, setStatus] = useState('Loading data...');
   const [error, setError] = useState<string | null>(null);
-  const [plate, setPlate] = useState<{ html: string; world: any } | null>(null);
   const [health, setHealth] = useState<Health>({});
   const [selected, setSelected] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
@@ -110,20 +104,13 @@ export default function Manacitra() {
   const setHighContrast = useManacitraStore(s => s.setHighContrast);
   useReducedMotion();
 
+  // map renders instantly; the model needs three.js to chunk in, so a fresh
+  // visit lands on the map rather than a loading shell
   const [view, setView] = useState<ViewMode>(() => {
     const v = localStorage.getItem('manacitra_view');
-    return v === 'model' || v === 'map' ? v : 'plate';
+    return v === 'model' || v === 'map' ? v : 'map';
   });
-  const viewRef = useRef(view);
-  viewRef.current = view;
-  const [host, setHost] = useState<HTMLDivElement | null>(null);
-  const liveRef = useRef<any>(null);
   const modelRef = useRef<ModelApi | null>(null);
-  const dataRef = useRef<ManacitraData | null>(null);
-  // the roster is usable before the plate finishes building, so a click that
-  // lands in that window is remembered and applied once the board is live
-  const pendingPick = useRef<string | null>(null);
-  const viewport = useViewport(host, PLATE_W, PLATE_H);
 
   const { online, total } = useMemo(() => {
     if (!data) return { online: 0, total: 0 };
@@ -137,105 +124,41 @@ export default function Manacitra() {
     return { online: on, total: t };
   }, [data]);
 
+  // the service the search box should jump to, shared by the map and the model
+  const searchHit = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    if (!needle || !data) return null;
+    return data.zones.flatMap((z) => z.services)
+      .find((sv) => sv.name.toLowerCase().includes(needle) || sv.id.includes(needle)) ?? null;
+  }, [query, data]);
+
   useEffect(() => {
     fetch('/manacitra/data.json')
       .then(r => r.json())
-      .then(async (d: ManacitraData) => {
-        setProgress(40); setStatus('Building switchboard...');
+      .then((d: ManacitraData) => {
+        setProgress(70); setStatus('Lighting lamps…');
         setData(d);
-        dataRef.current = d;
         setHealth(d.health || {});
-        const [{ buildPlate }, keys] = await Promise.all([
-          import('./figure/plate.mjs'),
-          fetch('/manacitra/keys.json').then(r => r.ok ? r.json() : {}).catch(() => ({})),
-        ]);
-        setProgress(80); setStatus('Wiring lamps...');
-        setPlate(buildPlate(d, keys));
         setProgress(100); setStatus('Ready');
         setLoaded(true);
       })
       .catch(() => { setError('Could not load map data.'); setStatus('Error'); setLoaded(true); });
   }, [setData]);
 
-  // The plate is written into the container imperatively, never as React
-  // children: a re-render would otherwise replace the SVG and wipe the live
-  // layer's lamp and cord state.
-  useEffect(() => {
-    if (!plate || !host) return;
-    host.innerHTML = plate.html;
-    let live: any = null;
-    (async () => {
-      const { mountLive } = await import('./figure/live.mjs');
-      live = mountLive(host, plate.world, dataRef.current, {
-        defaultReadout: `${online} of ${total} lamps lit`,
-        // the plate stays mounted (and its idle tour keeps ticking) while the
-        // model is shown — it must not steer the page at all from there
-        onSelect: (id: string | null) => { if (viewRef.current === 'plate') setSelected(id); },
-        onHover: (id: string | null) => { if (viewRef.current === 'plate') setHovered(id); },
-        onHealth: (h: Health) => setHealth(h),
-      });
-      liveRef.current = live;
-      if (pendingPick.current) {
-        const id = pendingPick.current;
-        pendingPick.current = null;
-        live.select(`svc:${id}`);
-        const p = live.pointOf(id);
-        if (p) viewport.centerOn(p[0], p[1], Math.max(viewport.view.scale, 2.2));
-        setSelected(id);
-      }
-    })();
-    return () => { live?.destroy?.(); liveRef.current = null; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plate, host]);
-
   const pick = useCallback((id: string) => {
-    if (view === 'map') {
-      setSelected(id);
-      return;
-    }
-    if (view === 'model') {
-      modelRef.current?.focus(id);
-      setSelected(id);
-      return;
-    }
-    const live = liveRef.current;
-    if (!live) {
-      pendingPick.current = id;
-      setSelected(id);
-      return;
-    }
-    live.select(`svc:${id}`);
-    const p = live.pointOf(id);
-    if (p) viewport.centerOn(p[0], p[1], Math.max(viewport.view.scale, 2.2));
+    if (view === 'model') modelRef.current?.focus(id);
     setSelected(id);
   }, [view]);
 
   const stateOf = (id: string) => (health[id] ? (health[id].online ? 'online' : 'offline') : 'unchecked');
 
-  const onQuery = useCallback((q: string) => {
-    setQuery(q);
-    const needle = q.trim().toLowerCase();
-    if (!needle) return;
-    if (view === 'map') {
-      const hit = (data?.zones.flatMap((z) => z.services) ?? [])
-        .find((sv) => sv.name.toLowerCase().includes(needle) || sv.id.includes(needle));
-      if (hit) setSelected(hit.id);
-      return;
+  // the map tracks the search target on its own; the model needs a nudge to fly there
+  useEffect(() => {
+    if (view === 'model' && searchHit) {
+      modelRef.current?.focus(searchHit.id);
+      setSelected(searchHit.id);
     }
-    if (view === 'model') {
-      const hit = (data?.zones.flatMap((z) => z.services) ?? [])
-        .find((sv) => sv.name.toLowerCase().includes(needle) || sv.id.includes(needle));
-      if (hit) { modelRef.current?.focus(hit.id); setSelected(hit.id); }
-      return;
-    }
-    const live = liveRef.current;
-    if (!live) return;
-    const id = live.setQuery(q);
-    if (id) {
-      const p = live.pointOf(id);
-      if (p) viewport.centerOn(p[0], p[1], Math.max(viewport.view.scale, 2.2));
-    }
-  }, [data, view]);
+  }, [searchHit, view]);
 
   return (
     <div
@@ -260,7 +183,7 @@ export default function Manacitra() {
       {loaded && !error && (
         <Tools
           query={query}
-          onQuery={onQuery}
+          onQuery={setQuery}
           theme={highContrast ? 'light' : 'dark'}
           onTheme={() => setHighContrast(!highContrast)}
           view={view}
@@ -270,11 +193,6 @@ export default function Manacitra() {
 
       <div className="mc-body">
         <div className="mc-stage-wrap" data-view={view}>
-          {/* The plate stays mounted underneath the model: re-building 1.18 MB of SVG
-              on every switch would make the toggle feel expensive. */}
-          <div className="mc-viewport" style={{ display: view === 'plate' ? undefined : 'none' }} {...viewport.pointerHandlers}>
-            {plate && <div ref={setHost} className="mc-plate-host" />}
-          </div>
           {view === 'map' && (
             <TierMap
               data={data}
@@ -305,12 +223,6 @@ export default function Manacitra() {
               {' · '}{stateOf(hovered)}
             </div>
           )}
-          <div className="mc-zoom" style={{ display: view === 'plate' ? undefined : 'none' }}>
-            <button onClick={() => viewport.zoomBy(1 / 1.4)} aria-label="Zoom out">−</button>
-            <button onClick={() => viewport.reset()} aria-label="Fit the whole board, straight on">{Math.round(viewport.view.scale * 100)}%</button>
-            <button onClick={() => viewport.zoomBy(1.4)} aria-label="Zoom in">+</button>
-            <span className="mc-zoom-hint">drag to turn · shift-drag to pan · scroll to zoom</span>
-          </div>
           {view === 'model' && (
             <span className="mc-zoom mc-model-hint">
               <span className="mc-zoom-hint">drag to turn · scroll to zoom · click a jack to trace</span>
@@ -334,13 +246,13 @@ export default function Manacitra() {
           selected={selected}
           hovered={hovered}
           onPick={pick}
-          onHover={(id) => { setHovered(id); liveRef.current?.mark(id); }}
+          onHover={(id) => setHovered(id)}
           query={query}
         />
       </div>
 
       {selected && data && (
-        <ServiceDetail data={data} health={health} id={selected} onClose={() => { liveRef.current?.clear(); setSelected(null); }} />
+        <ServiceDetail data={data} health={health} id={selected} onClose={() => setSelected(null)} />
       )}
     </div>
   );

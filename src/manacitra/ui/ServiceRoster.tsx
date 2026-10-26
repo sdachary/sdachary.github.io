@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { ManacitraData } from '../types';
+import ServiceIcon from './ServiceIcon';
 
 export interface Health {
   [id: string]: { online: boolean; checked_at?: string };
@@ -34,6 +35,7 @@ function ServiceRow({
       onBlur={() => onHover(null)}
     >
       <Lamp online={online} />
+      <span className="mc-row-icon"><ServiceIcon svc={svc} size={14} /></span>
       <span className="mc-row-name">{svc.name}</span>
       <span className="mc-row-type">{svc.type}</span>
     </button>

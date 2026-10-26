@@ -1,5 +1,6 @@
 import type { ManacitraData } from '../types';
 import type { Health } from './ServiceRoster';
+import ServiceIcon from './ServiceIcon';
 
 // What a service *is* and what it is wired to. The plate shows the call; this
 // card answers the questions a reader actually has about a jack — is it up,
@@ -33,10 +34,13 @@ export default function ServiceDetail({
   return (
     <div className="mc-detail" role="dialog" aria-label={`${svc.name} details`}>
       <div className="mc-detail-head">
-        <div>
-          <div className="mc-detail-name">{svc.name}</div>
-          <div className="mc-detail-sub">
-            {svc.type} · {zone?.label || zone?.name}
+        <div className="mc-detail-id">
+          <span className="mc-detail-icon"><ServiceIcon svc={svc} size={22} /></span>
+          <div>
+            <div className="mc-detail-name">{svc.name}</div>
+            <div className="mc-detail-sub">
+              {svc.type} · {zone?.label || zone?.name}
+            </div>
           </div>
         </div>
         <button className="mc-detail-close" onClick={onClose} aria-label="Close details">✕</button>
