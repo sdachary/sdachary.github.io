@@ -7,7 +7,7 @@
 | Path | Content |
 |------|---------|
 | `/` | Homepage SPA — Hero, About, Experience, Projects, Mānacitra embed (iframe), Contact, legal footer links |
-| `/manacitra.html` | Mānacitra infrastructure map — a **real 3D model** (three.js — drag to orbit, scroll to zoom, click a jack to trace its cords) with each service's **name and brand logo or type-glyph screen-printed onto the panel**, and a **2D tier map** (five labelled tiers, one labelled curve per connection); every block carries an icon so services are easy to tell apart, and lamp state = health; embedded on the homepage |
+| `/manacitra.html` | Mānacitra infrastructure map — a **real 3D model** (three.js — drag to orbit, scroll to zoom, click a jack to trace its cords) with each service's **name and brand logo or type-glyph screen-printed onto the panel**, and a **2D tier map** (five labelled tiers, one labelled curve per connection, drafted with real `world.mjs` dimensions — `PITCH_X`/`PANEL`/`ROW_Z`/`HOLE_PITCH`, schematic/not-to-scale); every block carries an icon so services are easy to tell apart, and lamp state = health; embedded on the homepage |
 | `/floweditor.html` | Internal React Flow editor for the map (admin only, no public link) |
 | `/privacy.html` | DPDP privacy notice |
 | `/terms.html` | Terms of Service |
