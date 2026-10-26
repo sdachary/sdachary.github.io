@@ -337,6 +337,90 @@
   padding: 2px 5px;
 }
 
+/* --- the tier map ------------------------------------------------------------ */
+/* the reading surface: five tier columns, a pill per service, a curve per wire */
+.mc-map {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5rem 1rem 4.5rem;
+}
+.mc-map svg { width: 100%; min-width: 720px; max-width: 1180px; height: auto; }
+
+.mc-map-col {
+  fill: rgba(19, 19, 19, 0.55);
+  stroke: rgba(163, 163, 163, 0.12);
+}
+.iso[data-theme="light"] .mc-map-col { fill: rgba(255, 255, 255, 0.72); stroke: rgba(0, 0, 0, 0.1); }
+
+.mc-map-tier {
+  font: 500 10px var(--anatomy-mono, ui-monospace, monospace);
+  letter-spacing: 0.18em;
+  fill: var(--anatomy-muted);
+}
+.iso[data-theme="light"] .mc-map-tier { fill: #8a8a8f; }
+
+.mc-map-svc { cursor: pointer; }
+.mc-map-svc rect {
+  fill: rgba(163, 163, 163, 0.07);
+  stroke: rgba(163, 163, 163, 0.16);
+  transition: fill 0.15s ease, stroke 0.15s ease;
+}
+.iso[data-theme="light"] .mc-map-svc rect { fill: rgba(0, 0, 0, 0.04); stroke: rgba(0, 0, 0, 0.12); }
+.mc-map-svc[data-hovered] rect { fill: rgba(163, 163, 163, 0.14); }
+.mc-map-svc[data-selected] rect { fill: rgba(255, 140, 26, 0.14); stroke: #ff8c1a; }
+.iso[data-theme="light"] .mc-map-svc[data-hovered] rect { fill: rgba(0, 0, 0, 0.07); }
+.iso[data-theme="light"] .mc-map-svc[data-selected] rect { fill: rgba(194, 106, 0, 0.12); stroke: #c26a00; }
+.mc-map-svc text {
+  font: 500 12.5px var(--anatomy-sans, system-ui, sans-serif);
+  fill: var(--anatomy-text);
+  pointer-events: none;
+}
+.iso[data-theme="light"] .mc-map-svc text { fill: #1d1d1d; }
+.mc-map-lamp { fill: #5a5a5a; }
+.mc-map-lamp[data-on] { fill: #ffb454; }
+.mc-map-lamp[data-on="off"] { fill: #2a2a2a; stroke: rgba(163, 163, 163, 0.35); }
+.iso[data-theme="light"] .mc-map-lamp { fill: #c9c9cc; }
+.iso[data-theme="light"] .mc-map-lamp[data-on] { fill: #c26a00; }
+.iso[data-theme="light"] .mc-map-lamp[data-on="off"] { fill: #b4b4b8; stroke: rgba(0, 0, 0, 0.2); }
+
+.mc-map-wire {
+  fill: none;
+  stroke: rgba(163, 163, 163, 0.3);
+  stroke-width: 1.4;
+  transition: stroke 0.15s ease, stroke-width 0.15s ease;
+}
+.iso[data-theme="light"] .mc-map-wire { stroke: rgba(0, 0, 0, 0.22); }
+.mc-map-wire-label {
+  font: 500 9.5px var(--anatomy-mono, ui-monospace, monospace);
+  letter-spacing: 0.06em;
+  fill: var(--anatomy-muted);
+  text-anchor: middle;
+  opacity: 0.6;
+  pointer-events: none;
+  /* a halo in the page colour, so a label reads where wires cross under it */
+  paint-order: stroke;
+  stroke: #0b0b0b;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+.iso[data-theme="light"] .mc-map-wire-label { stroke: #e9e9e7; }
+.iso[data-theme="light"] .mc-map-wire-label { fill: #8a8a8f; }
+.mc-map-wires > g[data-warm] .mc-map-wire { stroke: rgba(163, 163, 163, 0.6); }
+.mc-map-wires > g[data-lit] .mc-map-wire {
+  stroke: #ff8c1a;
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 6px rgba(255, 140, 26, 0.55));
+}
+.iso[data-theme="light"] .mc-map-wires > g[data-warm] .mc-map-wire { stroke: rgba(0, 0, 0, 0.45); }
+.iso[data-theme="light"] .mc-map-wires > g[data-lit] .mc-map-wire { stroke: #c26a00; filter: none; }
+.mc-map-wires > g[data-lit] .mc-map-wire-label { fill: var(--anatomy-strong, #ededea); opacity: 1; }
+.iso[data-theme="light"] .mc-map-wires > g[data-lit] .mc-map-wire-label { fill: #1d1d1d; }
+
 /* --- the model view ---------------------------------------------------------- */
 .mc-3d { position: absolute; inset: 0; z-index: 1; }
 .mc-3d canvas { display: block; }
@@ -461,6 +545,7 @@
   .mc-legend { display: none; }
   .mc-zoom-hint { display: none; }
   .mc-tools { top: 4.4rem; right: 1rem; left: 1rem; }
+  .mc-map { justify-content: flex-start; padding: 5.5rem 0.75rem 4.5rem; }
   .mc-search { flex: 1; width: auto; }
   .mc-view-switch { flex: none; }
 }

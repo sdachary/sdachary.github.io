@@ -5,11 +5,14 @@ import './manacitra.css';
 // three.js only arrives with the model view; the plate stays light to load
 const Model3D = lazy(() => import('./scene/Model3D'));
 import ServiceRoster, { type Health } from './ui/ServiceRoster';
+import TierMap from './ui/TierMap';
 import ServiceDetail from './ui/ServiceDetail';
 import { useViewport } from './controls/useViewport';
 import { useReducedMotion } from './a11y/useReducedMotion';
 import { useManacitraStore } from './store';
 import type { ManacitraData } from './types';
+
+type ViewMode = 'plate' | 'model' | 'map';
 
 const PLATE_W = 780;
 const PLATE_H = 560;
@@ -66,13 +69,14 @@ function Header({ online, total }: { online: number; total: number }) {
 
 function Tools({ query, onQuery, theme, onTheme, view, onView }: {
   query: string; onQuery: (q: string) => void; theme: string; onTheme: () => void;
-  view: string; onView: (v: 'plate' | 'model') => void;
+  view: string; onView: (v: ViewMode) => void;
 }) {
   return (
     <div className="mc-tools">
       <div className="mc-view-switch" role="group" aria-label="Choose a view of the board">
         <button data-on={view === 'plate'} aria-pressed={view === 'plate'} onClick={() => onView('plate')}>Board</button>
         <button data-on={view === 'model'} aria-pressed={view === 'model'} onClick={() => onView('model')}>Model</button>
+        <button data-on={view === 'map'} aria-pressed={view === 'map'} onClick={() => onView('map')}>Map</button>
       </div>
       <input
         type="search"
@@ -106,7 +110,10 @@ export default function Manacitra() {
   const setHighContrast = useManacitraStore(s => s.setHighContrast);
   useReducedMotion();
 
-  const [view, setView] = useState<'plate' | 'model'>(() => localStorage.getItem('manacitra_view') === 'model' ? 'model' : 'plate');
+  const [view, setView] = useState<ViewMode>(() => {
+    const v = localStorage.getItem('manacitra_view');
+    return v === 'model' || v === 'map' ? v : 'plate';
+  });
   const viewRef = useRef(view);
   viewRef.current = view;
   const [host, setHost] = useState<HTMLDivElement | null>(null);
@@ -182,6 +189,10 @@ export default function Manacitra() {
   }, [plate, host]);
 
   const pick = useCallback((id: string) => {
+    if (view === 'map') {
+      setSelected(id);
+      return;
+    }
     if (view === 'model') {
       modelRef.current?.focus(id);
       setSelected(id);
@@ -205,6 +216,12 @@ export default function Manacitra() {
     setQuery(q);
     const needle = q.trim().toLowerCase();
     if (!needle) return;
+    if (view === 'map') {
+      const hit = (data?.zones.flatMap((z) => z.services) ?? [])
+        .find((sv) => sv.name.toLowerCase().includes(needle) || sv.id.includes(needle));
+      if (hit) setSelected(hit.id);
+      return;
+    }
     if (view === 'model') {
       const hit = (data?.zones.flatMap((z) => z.services) ?? [])
         .find((sv) => sv.name.toLowerCase().includes(needle) || sv.id.includes(needle));
@@ -258,6 +275,16 @@ export default function Manacitra() {
           <div className="mc-viewport" style={{ display: view === 'plate' ? undefined : 'none' }} {...viewport.pointerHandlers}>
             {plate && <div ref={setHost} className="mc-plate-host" />}
           </div>
+          {view === 'map' && (
+            <TierMap
+              data={data}
+              health={health}
+              selected={selected}
+              hovered={hovered}
+              onSelect={(id) => setSelected(id)}
+              onHover={(id) => setHovered(id)}
+            />
+          )}
           {view === 'model' && (
             <Suspense fallback={<div className="mc-3d-loading">Building the model…</div>}>
               <Model3D
@@ -287,6 +314,11 @@ export default function Manacitra() {
           {view === 'model' && (
             <span className="mc-zoom mc-model-hint">
               <span className="mc-zoom-hint">drag to turn · scroll to zoom · click a jack to trace</span>
+            </span>
+          )}
+          {view === 'map' && (
+            <span className="mc-zoom mc-model-hint">
+              <span className="mc-zoom-hint">hover a service to warm its wires · click to trace</span>
             </span>
           )}
           <p className="mc-legend">
