@@ -322,11 +322,22 @@
 }
 .mc-map svg { width: 100%; min-width: 720px; max-width: 1180px; height: auto; }
 
+/* Each column tints from its zone's own colour in data.json (--zone, set on the
+   group): coloured pads under the components, the way a circuit board's regions
+   read apart. Mix to an opaque colour, then dial the glass back with opacity so
+   the board still shows through exactly as before. */
 .mc-map-col {
-  fill: rgba(19, 19, 19, 0.55);
-  stroke: rgba(163, 163, 163, 0.12);
+  fill: color-mix(in srgb, var(--zone, #8a8a8a) 16%, #131313);
+  fill-opacity: 0.55;
+  stroke: color-mix(in srgb, var(--zone, #8a8a8a) 55%, #a3a3a3);
+  stroke-opacity: 0.3;
 }
-.iso[data-theme="light"] .mc-map-col { fill: rgba(255, 255, 255, 0.72); stroke: rgba(0, 0, 0, 0.1); }
+.iso[data-theme="light"] .mc-map-col {
+  fill: color-mix(in srgb, var(--zone, #8a8a8a) 14%, #ffffff);
+  fill-opacity: 0.72;
+  stroke: color-mix(in srgb, var(--zone, #8a8a8a) 60%, #000000);
+  stroke-opacity: 0.2;
+}
 
 .mc-map-tier {
   font: 500 10px var(--anatomy-mono, ui-monospace, monospace);

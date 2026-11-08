@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import type { CSSProperties } from 'react';
 import type { ManacitraData } from '../types';
 import ServiceIcon from './ServiceIcon';
 import { HOLE_PITCH, PANEL, PITCH_X, ROW_Z } from '../figure/world.mjs';
@@ -211,7 +212,10 @@ export default function TierMap({ data, health, selected, hovered, onSelect, onH
             const x = PAD + i * (COL_W + GAP);
             const rows = Math.max(1, z.services.length);
             return (
-              <g key={z.id}>
+              // --zone is data.json's own tier colour: the column pad tints from
+              // it like a coloured region on a circuit board, so the five blocks
+              // read apart in either theme without touching pill text contrast
+              <g key={z.id} style={{ '--zone': z.color } as CSSProperties}>
                 <rect className="mc-map-col" x={x - 12} y={PAD - 26} width={COL_W + 24} height={HEAD + rows * ROW + 4} rx={10} />
                 <text className="mc-map-tier" x={x + COL_W / 2} y={PAD - 8} textAnchor="middle">{z.label || z.name}</text>
                 {z.services.map((svc, j) => {
