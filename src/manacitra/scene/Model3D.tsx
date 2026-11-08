@@ -269,15 +269,15 @@ export default function Model3D({ data, health, selected, hovered, theme, onSele
     };
 
     const deskMat = mat({ color: pal.desk, roughness: 0.85 });
-    const trimMat = mat({ color: pal.trim, roughness: 0.6 });
 
-    // the map's zone pad, as a material: every tier slab mixes a little of its
-    // zone's own colour into the panel, so the model's blocks read apart exactly
-    // the way the map's do. Trim, cords and lamps stay neutral — the tint lives
-    // only on the slab. Mixed in sRGB like color-mix(in srgb): three's own lerp
-    // runs in linear space and would overshoot the hue the map shows. Light
-    // mixes harder (55% vs the map's 14%) because the scene's key light washes
-    // a pale panel back to near-white; 16% matches dark's visible pad.
+    // the map's zone pad, as a material: every tier slab, its trim bar and the
+    // floor stripe under it mix a little of their zone's own colour in, so the
+    // model's blocks read apart exactly the way the map's does. Cords, lamps,
+    // screws and the printed faces stay neutral — health and labels never move.
+    // Mixed in sRGB like color-mix(in srgb): three's own lerp runs in linear
+    // space and would overshoot the hue the map shows. Light mixes harder than
+    // the map's 14% (the key light washes a pale panel back to near-white);
+    // dark matches the map's visible pad at 16%.
     const mixHex = (a: number, b: string, k: number) => {
       const m = /^#([0-9a-f]{6})$/i.exec(b);
       const n = m ? parseInt(m[1], 16) : a;
@@ -289,6 +289,14 @@ export default function Model3D({ data, health, selected, hovered, theme, onSele
     const zonePanel = (hex: string) => mat({
       color: mixHex(pal.panel, hex, theme === 'light' ? 0.55 : 0.16),
       roughness: 0.72,
+    });
+    const zoneTrim = (hex: string) => mat({
+      color: mixHex(pal.trim, hex, theme === 'light' ? 0.5 : 0.35),
+      roughness: 0.6,
+    });
+    const zoneFloor = (hex: string) => mat({
+      color: mixHex(pal.desk, hex, theme === 'light' ? 0.45 : 0.3),
+      roughness: 0.85,
     });
     const plugMat = mat({ color: pal.plug, roughness: 0.4, metalness: 0.4 });
     const holeMat = mat({ color: pal.hole, roughness: 0.9 });
@@ -310,8 +318,13 @@ export default function Model3D({ data, health, selected, hovered, theme, onSele
       const bx = (bay.x0 + bay.x1) / 2;
       const panel = box(bay.w, h, PANEL.d, zonePanel(bay.zone.color), bx, h / 2, PANEL.y + PANEL.d / 2);
       panel.receiveShadow = true;
-      const trim = box(bay.w - 26, 5, 3, trimMat, bx, STRIP.zc, STRIP.faceY - 1.5);
+      const trim = box(bay.w - 26, 5, 3, zoneTrim(bay.zone.color), bx, STRIP.zc, STRIP.faceY - 1.5);
       trim.castShadow = true;
+      // floor stripe: the desk in front of this tier (panel face z=-36 to z=14,
+      // clear of the box footprint at z=17), tinted like the map's column pad.
+      // Sinks 0.5 into the desk so no coplanar face can fight its top.
+      const pad = box(bay.w, 2, 50, zoneFloor(bay.zone.color), bx, 8.5, -11);
+      pad.receiveShadow = true;
       for (const dx of [6, bay.w - 6]) for (const dz of [PANEL.z0 + 6, PANEL.z1 - 6]) screw(bay.x0 + dx, dz, FACE_Y);
       const label = document.createElement('div');
       label.className = 'mc-3d-tier';
@@ -326,6 +339,10 @@ export default function Model3D({ data, health, selected, hovered, theme, onSele
     const homeBox = box(BOX.w, BOX_H, BOX.d, zonePanel(world.box?.zone.color ?? '#8a8a8a'), BOX.x + BOX.w / 2, BOX.top - BOX_H / 2, BOX.y + BOX.d / 2);
     homeBox.receiveShadow = true;
     if (world.box) {
+      // plinth pad: a lip of the home zone's colour around the box's footprint,
+      // sunk 0.5 into the desk like the bay pads
+      const fpad = box(BOX.w + 10, 2, 42, zoneFloor(world.box.zone.color), BOX.x + BOX.w / 2, 8.5, 35);
+      fpad.receiveShadow = true;
       for (const dx of [4, BOX.w - 4]) for (const dz of [14, 36]) screw(BOX.x + dx, dz, BOX.faceY);
       const label = document.createElement('div');
       label.className = 'mc-3d-tier';
