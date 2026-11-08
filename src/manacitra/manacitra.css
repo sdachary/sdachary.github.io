@@ -463,8 +463,10 @@
   color: var(--anatomy-muted);
   transform: translateY(-6px);
   white-space: nowrap;
+  border-left: 3px solid var(--anatomy-muted);
+  padding-left: 8px;
 }
-.iso[data-theme="light"] .mc-3d-tier { color: #8a8a8f; }
+.iso[data-theme="light"] .mc-3d-tier { color: #8a8a8f; border-left-color: #8a8a8f; }
 .mc-3d-loading {
   position: absolute;
   inset: 0;
