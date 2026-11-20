@@ -1,6 +1,38 @@
 [
   {
     "kind": "feature",
+    "phase": "Phase 65",
+    "project": "PORTFOLIO",
+    "description": "Hero redesign: floating 3D Mānacitra board with pointer tilt + quiet hero mode",
+    "date": "2026-11-20",
+    "status": "completed"
+  },
+  {
+    "kind": "feature",
+    "phase": "Phase 65",
+    "project": "PORTFOLIO",
+    "description": "Motion migration completed: motion/react across the portfolio, framer-motion removed",
+    "date": "2026-11-20",
+    "status": "completed"
+  },
+  {
+    "kind": "feature",
+    "phase": "Phase 65",
+    "project": "MANACITRA",
+    "description": "Manacitra quiet hero embed + 3D lighting premium retune (graphite board, indigo key light)",
+    "date": "2026-11-20",
+    "status": "completed"
+  },
+  {
+    "kind": "feature",
+    "phase": "Phase 65",
+    "project": "MANACITRA",
+    "description": "Manacitra task 7: zone-tint trim strips and desk floor pads",
+    "date": "2026-11-09",
+    "status": "completed"
+  },
+  {
+    "kind": "feature",
     "phase": "Phase 57",
     "project": "SAMPADA",
     "description": "Web Push notifications — VAPID keys, SOPS+age encryption, Sidekiq delivery jobs, service worker",

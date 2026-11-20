@@ -210,7 +210,7 @@ export default function Model3D({ data, health, selected, hovered, theme, onSele
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = theme === 'light' ? 1.02 : 1.05;
+    renderer.toneMappingExposure = theme === 'light' ? 1.02 : 1.12;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;   // PCFSoft was removed in r186
     host.appendChild(renderer.domElement);
@@ -236,8 +236,8 @@ export default function Model3D({ data, health, selected, hovered, theme, onSele
     controls.maxPolarAngle = Math.PI * 0.88;
     controls.target.set(-4, 62, 6);
 
-    scene.add(new THREE.AmbientLight(0xffffff, theme === 'light' ? 0.62 : 0.34));
-    const key = new THREE.DirectionalLight(0xffffff, theme === 'light' ? 1.5 : 1.35);
+    scene.add(new THREE.AmbientLight(0xffffff, theme === 'light' ? 0.62 : 0.44));
+    const key = new THREE.DirectionalLight(0xffffff, theme === 'light' ? 1.5 : 1.6);
     key.position.set(190, 260, 230);
     key.castShadow = true;
     key.shadow.mapSize.set(2048, 2048);
@@ -250,14 +250,14 @@ export default function Model3D({ data, health, selected, hovered, theme, onSele
     key.shadow.bias = -0.0006;
     key.shadow.normalBias = 1.2;
     scene.add(key);
-    const rim = new THREE.DirectionalLight(0xffffff, theme === 'light' ? 0.45 : 0.55);
+    const rim = new THREE.DirectionalLight(0xffffff, theme === 'light' ? 0.45 : 0.75);
     rim.position.set(-280, 130, -190);
     scene.add(rim);
 
     const mat = (p: THREE.MeshStandardMaterialParameters) => track(new THREE.MeshStandardMaterial({
       // how much of the room the surface picks up — the dark board wants the
       // fill without losing its mood, the light one wants the bounce
-      envMapIntensity: theme === 'light' ? 0.5 : 0.4,
+      envMapIntensity: theme === 'light' ? 0.5 : 0.55,
       ...p,
     }));
     const geo = <T extends THREE.BufferGeometry>(x: T) => track(x);

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 
 const paragraphs = [
   <>Started as an <strong>HR professional</strong>. Pivoted hard into data. Taught myself Python at nights, SQL on weekends. Shipped my first analytics dashboard before anyone asked me to.</>,

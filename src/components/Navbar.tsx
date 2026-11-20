@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'motion/react'
 
 const links = [
   { href: '#about', label: 'Origin' },
@@ -97,15 +97,12 @@ export default function Navbar() {
   const { theme, toggle } = useTheme()
   const navRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const onScroll = () => {
-      const about = document.getElementById('about')
-      if (!about) return
-      setVisible(about.getBoundingClientRect().top < window.innerHeight * 0.8)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  // The hero is one viewport tall, so "past the fold" is the reveal threshold.
+  // motion's scroll motion value keeps this off a hand-rolled scroll listener.
+  const { scrollY } = useScroll()
+  const pastFold = () => window.scrollY > window.innerHeight * 0.8
+  useMotionValueEvent(scrollY, 'change', y => setVisible(y > window.innerHeight * 0.8))
+  useEffect(() => { setVisible(pastFold()) }, [])
 
   useEffect(() => {
     if (!mobileOpen) return

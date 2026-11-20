@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { CONFIG } from '../config'
 
 const links = [
@@ -45,10 +45,6 @@ export default function Contact() {
       <div className="contact-bg-text" aria-hidden="true">DEEPAK</div>
 
       <div className="contact-inner">
-        <div className="section-header contact-header">
-          <h2 className="section-title">Let's Connect</h2>
-        </div>
-
         <div className="contact-grid">
           <div>
             <motion.h2
@@ -58,7 +54,7 @@ export default function Contact() {
               transition={{ duration: 0.8, ease }}
               className="contact-headline"
             >
-              READY<br />TO BUILD<br />TOGETHER?
+              Let's build<br />something<br />worth keeping.
             </motion.h2>
 
             <nav className="contact-links" aria-label="Contact links">
@@ -72,7 +68,7 @@ export default function Contact() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: 0.2 + i * 0.08, ease }}
-                  className={`contact-link${l.wide ? ' contact-link-wide' : ''}`}
+                  className={`contact-link${l.wide ? ' contact-link-email' : ''}`}
                 >
                   <span aria-hidden="true">→</span>
                   <span className="contact-link-label">{l.label}</span>

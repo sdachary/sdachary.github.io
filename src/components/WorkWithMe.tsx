@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import type { WorkTrack } from '../data/types'
 
 const tracks: WorkTrack[] = [
@@ -55,14 +55,10 @@ function Card({ data, side, accent }: { data: WorkTrack; side: 'left' | 'right';
 export default function WorkWithMe() {
   return (
     <section id="work" className="section section-alt section-divider-both">
-      <div className="section-header">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease }}
-          className="section-title"
-        >How I Can Help</motion.h2>
+      <div className="sec-head">
+        <span className="sec-num">07</span>
+        <h2 className="sec-title">Work with me</h2>
+        <span className="sec-note">Two ways in</span>
       </div>
 
       <div className="dual-grid">

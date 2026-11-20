@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { motion, type Variants } from 'framer-motion'
+import { motion, type Variants } from 'motion/react'
 import type { Project } from '../data/types'
 
 const ease = [0.32, 0.72, 0, 1] as const
@@ -32,7 +32,7 @@ export default function Projects() {
 
   if (loading) return (
     <section id="projects" className="section section-alt">
-      <div className="section-header"><h2 className="section-title">Projects</h2></div>
+      <div className="sec-head"><span className="sec-num">03</span><h2 className="sec-title">Projects</h2><span className="sec-note">Loading</span></div>
       <div className="projects-bento">
         {[1,2,3].map(i => <div key={i} className="project-card project-card-skeleton" />)}
       </div>
@@ -41,8 +41,8 @@ export default function Projects() {
 
   if (error) return (
     <section id="projects" className="section section-alt">
-      <div className="section-header"><h2 className="section-title">Projects</h2></div>
-      <p className="activity-desc">Failed to load projects.</p>
+      <div className="sec-head"><span className="sec-num">03</span><h2 className="sec-title">Projects</h2><span className="sec-note">Unavailable</span></div>
+      <p className="activity-empty">Failed to load projects.</p>
     </section>
   )
 
@@ -51,17 +51,14 @@ export default function Projects() {
   const sorted = [...projects]
     .filter(p => p.slug !== 'manacitra')
     .sort((a, b) => a.name.localeCompare(b.name))
+  const liveCount = sorted.filter(isFeatured).length
 
   return (
     <section id="projects" className="section section-alt section-clip">
-      <div className="section-header">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease }}
-          className="section-title"
-        >Projects</motion.h2>
+      <div className="sec-head">
+        <span className="sec-num">03</span>
+        <h2 className="sec-title">Projects</h2>
+        <span className="sec-note">{sorted.length} shipped, {liveCount} live</span>
       </div>
 
       <motion.div

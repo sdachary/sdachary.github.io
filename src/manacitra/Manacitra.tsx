@@ -111,8 +111,13 @@ export default function Manacitra() {
 
   // map renders instantly; the model needs three.js to chunk in, so a fresh
   // visit lands on the map rather than a loading shell
+  // The portfolio hero embeds this page with ?view=model&quiet=1: the model
+  // gets the stage and the chrome (rail / search / legend / zoom) stays out of
+  // the way. Standalone visits keep the full switchboard.
+  const mcParams = useMemo(() => new URLSearchParams(window.location.search), []);
+  const quiet = mcParams.get('quiet') === '1';
   const [view, setView] = useState<ViewMode>(() => {
-    const v = localStorage.getItem('manacitra_view');
+    const v = mcParams.get('view') ?? localStorage.getItem('manacitra_view');
     return v === 'model' || v === 'map' ? v : 'map';
   });
   const modelRef = useRef<ModelApi | null>(null);
@@ -188,8 +193,8 @@ export default function Manacitra() {
           <button onClick={() => window.location.reload()}>Retry</button>
         </div>
       ) : !loaded ? <Loader progress={progress} status={status} /> : null}
-      {loaded && !error && <Header online={online} total={total} />}
-      {loaded && !error && (
+      {loaded && !error && !quiet && <Header online={online} total={total} />}
+      {loaded && !error && !quiet && (
         <Tools
           query={query}
           onQuery={setQuery}
@@ -232,32 +237,36 @@ export default function Manacitra() {
               {' · '}{stateOf(hovered)}
             </div>
           )}
-          {view === 'model' && (
+          {!quiet && view === 'model' && (
             <span className="mc-zoom mc-model-hint">
               <span className="mc-zoom-hint">drag to turn · scroll to zoom · click a jack to trace</span>
             </span>
           )}
-          {view === 'map' && (
+          {!quiet && view === 'map' && (
             <span className="mc-zoom mc-model-hint">
               <span className="mc-zoom-hint">hover a service to warm its wires · click to trace</span>
             </span>
           )}
-          <p className="mc-legend">
-            <span><i className="mc-lamp" data-state="on" /> lit — service is up</span>
-            <span><i className="mc-lamp" data-state="off" /> dark — needs attention</span>
-            <span><i className="mc-legend-cord" /> a cord is a connection</span>
-          </p>
+          {!quiet && (
+            <p className="mc-legend">
+              <span><i className="mc-lamp" data-state="on" /> lit — service is up</span>
+              <span><i className="mc-lamp" data-state="off" /> dark — needs attention</span>
+              <span><i className="mc-legend-cord" /> a cord is a connection</span>
+            </p>
+          )}
         </div>
 
-        <ServiceRoster
-          data={data}
-          health={health}
-          selected={selected}
-          hovered={hovered}
-          onPick={pick}
-          onHover={(id) => setHovered(id)}
-          query={query}
-        />
+        {!quiet && (
+          <ServiceRoster
+            data={data}
+            health={health}
+            selected={selected}
+            hovered={hovered}
+            onPick={pick}
+            onHover={(id) => setHovered(id)}
+            query={query}
+          />
+        )}
       </div>
 
       {selected && data && (

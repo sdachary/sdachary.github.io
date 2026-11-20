@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { motion, type Variants } from 'framer-motion'
+import { motion, type Variants } from 'motion/react'
 import posts from '../data/blog'
 import SanitizedHtml from './SanitizedHtml'
 
@@ -29,14 +29,10 @@ export default function Blog() {
 
   return (
     <section id="blog" className="section section-alt section-divider">
-      <div className="section-header">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease }}
-          className="section-title"
-        >Blog</motion.h2>
+      <div className="sec-head">
+        <span className="sec-num">05</span>
+        <h2 className="sec-title">Notes</h2>
+        <span className="sec-note">{posts.length} posts</span>
       </div>
 
       <div className="blog-controls">

@@ -1,45 +1,47 @@
-import { motion, type Variants } from 'framer-motion'
+import { motion } from 'motion/react'
 import skills from '../data/skills'
 
-const ease = [0.32, 0.72, 0, 1] as const
+const ease = [0.22, 1, 0.36, 1] as const
 
-const container: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.025 } },
-}
-
-const item: Variants = {
-  hidden: { opacity: 0, y: 16, scale: 0.96 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease } },
-}
+// Preserve the source order of categories, group the names under each.
+const groups = skills.reduce<{ name: string; items: string[] }[]>((acc, s) => {
+  const group = acc.find(g => g.name === s.category)
+  if (group) group.items.push(s.name)
+  else acc.push({ name: s.category, items: [s.name] })
+  return acc
+}, [])
 
 export default function Skills() {
   return (
     <section id="skills" className="section">
-      <div className="section-header">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease }}
-          className="section-title"
-        >Tech Stack</motion.h2>
+      <div className="sec-head">
+        <span className="sec-num">02</span>
+        <h2 className="sec-title">Stack</h2>
+        <span className="sec-note">{skills.length} tools in daily use</span>
       </div>
 
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-        className="skills-grid"
-      >
-        {skills.map((s, i) => (
-          <motion.div key={i} variants={item} className="skill-card">
-            <div className="skill-category">{s.category}</div>
-            <div className="skill-name">{s.name}</div>
+      <div className="skill-groups">
+        {groups.map((g, i) => (
+          <motion.div
+            key={g.name}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.45, delay: i * 0.05, ease }}
+            className="skill-group"
+          >
+            <h3 className="skill-group-name">{g.name}</h3>
+            <p className="skill-group-list">
+              {g.items.map((name, j) => (
+                <span key={name}>
+                  {j > 0 && <span className="skill-group-sep" aria-hidden="true">·</span>}
+                  {name}
+                </span>
+              ))}
+            </p>
           </motion.div>
         ))}
-      </motion.div>
+      </div>
     </section>
   )
 }

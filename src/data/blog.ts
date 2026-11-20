@@ -8,6 +8,18 @@ interface BlogPost {
 
 const posts: BlogPost[] = [
   {
+    slug: 'hero-floating-board',
+    title: 'The Board, Floating',
+    date: '2026-11-20',
+    tags: ['portfolio', 'manacitra', 'design', '3d'],
+    body: `
+      <p>The hero used to be a framed screenshot of the switchboard. Same object, flat picture, nothing alive in it.</p>
+      <p>Now the hero embeds the board itself via <code>?view=model&amp;quiet=1</code>, and the scene floats. It leans with the pointer through pointer-tracked springs, breathes on its own, and stays quiet: no rail, no search, no legend, no zoom hint. The frame only carries the live dot, a one-line label, and an open-in-fullscreen link.</p>
+      <p>Quiet mode is the product decision, not an afterthought. A hero that has to render a search box and a detail card is a hero that is already crowded. The board should show the design. The chrome is for the page.</p>
+      <p>Behind it: the three.js scene got a lighting pass that treats the dark board like a physical object, low ambient fill, strong key with a rim, exposure headroom, so the graphite reads as graphite instead of a black box and the indigo stops being decorative and starts being light.</p>
+    `,
+  },
+  {
     slug: 'sampada-web-push',
     title: 'Web Push Notifications for Sampada',
     date: '2026-09-04',
