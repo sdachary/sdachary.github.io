@@ -32,6 +32,30 @@
     "status": "completed"
   },
   {
+    "kind": "bugfix",
+    "phase": "Phase 57",
+    "project": "SAMPADA",
+    "description": "fix(frontend): dashboard spacing, nav dedupe, error recovery, OTP countdown",
+    "date": "2026-11-20",
+    "status": "completed"
+  },
+  {
+    "kind": "feature",
+    "phase": "",
+    "project": "ACHARYLAB",
+    "description": "vayalabs: scroll-linked diagram motion, automatic reveal cascades + stat count-ups",
+    "date": "2026-11-19",
+    "status": "completed"
+  },
+  {
+    "kind": "build",
+    "phase": "Phase 61",
+    "project": "PRAYOG",
+    "description": "chore: compact layout - reduce spacing, make footer horizontal",
+    "date": "2026-11-18",
+    "status": "completed"
+  },
+  {
     "kind": "feature",
     "phase": "Phase 57",
     "project": "SAMPADA",
