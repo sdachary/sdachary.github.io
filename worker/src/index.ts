@@ -1,6 +1,14 @@
 export interface Env {
   NOTION_TOKEN?: string
   NOTION_DATABASE_ID?: string
+  RATE_LIMIT?: KVStore
+}
+
+// Minimal Workers KV surface, so the worker typechecks without pulling in
+// @cloudflare/workers-types.
+export interface KVStore {
+  get(key: string): Promise<string | null>
+  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>
 }
 
 const ALLOWED_ORIGINS = ['https://sdachary.github.io', 'http://localhost:5173', 'http://localhost:4173']
@@ -19,9 +27,21 @@ const RATE_LIMIT_MAX = 5
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
 const hits = new Map<string, number[]>()
 
-// ponytail: in-memory per-isolate limiter. Move to KV or Durable Objects if
-// real traffic ever needs a global budget across isolates.
-export function isRateLimited(ip: string, now = Date.now()): boolean {
+// ponytail: KV counter, not a Durable Object. Read-then-write is not atomic, so
+// concurrent posts can slip past the cap by one or two. Move to a Durable
+// Object if that ever matters.
+export async function isRateLimited(env: Env, ip: string): Promise<boolean> {
+  const kv = env.RATE_LIMIT
+  if (!kv) return isRateLimitedLocal(ip)
+  const key = `rl:${ip}`
+  const count = Number(await kv.get(key) ?? '0') + 1
+  await kv.put(key, String(count), { expirationTtl: Math.ceil(RATE_LIMIT_WINDOW_MS / 1000) })
+  return count > RATE_LIMIT_MAX
+}
+
+// Fallback for local dev without the KV binding. Per-isolate only, so it is a
+// soft backstop, never the production limit.
+export function isRateLimitedLocal(ip: string, now = Date.now()): boolean {
   const recent = (hits.get(ip) ?? []).filter(t => now - t < RATE_LIMIT_WINDOW_MS)
   if (recent.length >= RATE_LIMIT_MAX) {
     hits.set(ip, recent)
@@ -111,7 +131,7 @@ export default {
 
     const headers = corsHeaders(origin)
 
-    if (isRateLimited(clientIp(request))) {
+    if (await isRateLimited(env, clientIp(request))) {
       return new Response(JSON.stringify({ error: 'Too many requests, try again later' }), {
         status: 429,
         headers: { ...headers, 'Content-Type': 'application/json', 'Retry-After': '600' },

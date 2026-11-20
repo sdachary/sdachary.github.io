@@ -4,3 +4,7 @@ compatibility_date = "2025-04-01"
 
 [vars]
 NOTION_DATABASE_ID = "3d758aef-cf9d-8164-9d2c-e3519633dbc8"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "4e4e206596dd4b08a1937841352d6a9f"

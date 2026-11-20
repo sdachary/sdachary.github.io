@@ -1,7 +1,19 @@
 import { describe, it, expect } from 'vitest'
-import worker, { isRateLimited } from './index'
+import worker, { isRateLimited, isRateLimitedLocal, type Env } from './index'
 
-const ENV = { NOTION_TOKEN: 'test-token', NOTION_DATABASE_ID: 'test-db' }
+function mockKv(): Env['RATE_LIMIT'] {
+  const store = new Map<string, string>()
+  return {
+    async get(key: string) { return store.get(key) ?? null },
+    async put(key: string, value: string) { store.set(key, value) },
+  }
+}
+
+const ENV: Env = {
+  NOTION_TOKEN: 'test-token',
+  NOTION_DATABASE_ID: 'test-db',
+  RATE_LIMIT: mockKv(),
+}
 
 // `Origin` is a forbidden header name, so the Request constructor strips it in
 // the test runtime. Cloudflare and browsers do send it, so mock the request.
@@ -44,21 +56,30 @@ describe('contact worker', () => {
     expect(res.status).toBe(200)
   })
 
-  it('rate limits an ip after 5 posts', () => {
-    expect(isRateLimited('10.0.0.5', 1000)).toBe(false)
-    for (let i = 0; i < 4; i++) expect(isRateLimited('10.0.0.5', 1000 + i)).toBe(false)
-    expect(isRateLimited('10.0.0.5', 1005)).toBe(true)
+  it('counts requests per ip in kv', async () => {
+    const env: Env = { RATE_LIMIT: mockKv() }
+    for (let i = 0; i < 5; i++) expect(await isRateLimited(env, '10.1.0.1')).toBe(false)
+    expect(await isRateLimited(env, '10.1.0.1')).toBe(true)
+    // another ip has its own budget
+    expect(await isRateLimited(env, '10.1.0.2')).toBe(false)
+  })
+
+  it('falls back to the local counter without a kv binding', async () => {
+    expect(isRateLimitedLocal('10.2.0.1', 1000)).toBe(false)
+    for (let i = 0; i < 4; i++) expect(isRateLimitedLocal('10.2.0.1', 1000 + i)).toBe(false)
+    expect(isRateLimitedLocal('10.2.0.1', 1005)).toBe(true)
     // window slides
-    expect(isRateLimited('10.0.0.5', 1000 + 11 * 60 * 1000)).toBe(false)
+    expect(isRateLimitedLocal('10.2.0.1', 1000 + 11 * 60 * 1000)).toBe(false)
   })
 
   it('returns 429 once the ip budget is spent', async () => {
+    const env: Env = { ...ENV, RATE_LIMIT: mockKv() }
     const ip = '10.0.0.6'
     for (let i = 0; i < 5; i++) {
-      const res = await worker.fetch(post({ ...valid, website: 'bot' }, ip), ENV)
+      const res = await worker.fetch(post({ ...valid, website: 'bot' }, ip), env)
       expect(res.status).toBe(200)
     }
-    const blocked = await worker.fetch(post({ ...valid, website: 'bot' }, ip), ENV)
+    const blocked = await worker.fetch(post({ ...valid, website: 'bot' }, ip), env)
     expect(blocked.status).toBe(429)
   })
 })
