@@ -1,5 +1,21 @@
 [
   {
+    "kind": "chore",
+    "phase": "Phase 66",
+    "project": "PORTFOLIO",
+    "description": "Big-wave cleanup: merged dependabot PRs #10/#11/#15, deleted extra branches, synced main",
+    "date": "2026-11-20",
+    "status": "completed"
+  },
+  {
+    "kind": "docs",
+    "phase": "Phase 66",
+    "project": "ACHARYLAB",
+    "description": "Pending-wave status refresh: MCP hub merged and pushed live, nisha plugin WIP pending, n8n runtime clean, KG-to-portfolio loop wired",
+    "date": "2026-11-20",
+    "status": "completed"
+  },
+  {
     "kind": "feature",
     "phase": "Phase 65",
     "project": "PORTFOLIO",
