@@ -8,6 +8,18 @@ interface BlogPost {
 
 const posts: BlogPost[] = [
   {
+    slug: 'sampada-serverless-migration',
+    title: 'Sampada Left the Single VM',
+    date: '2026-11-20',
+    tags: ['sampada', 'infra', 'migration', 'scalability'],
+    body: `
+      <p>Sampada just left the single VM. The refactor was boring on purpose: extract the long-lived state, split the runtime, and move the pieces that deserved serverless treatment to managed functions. The goal was simple: better scalability without giving up the boring parts.</p>
+      <p>The migration from oradb to serverless was mostly data-shape work, not architecture theater. The tricky bit was the migration path itself: dual-run the old and new backends against the same database until writes had drained, then cut over. Zero downtime, no dual-schema permanent debt.</p>
+      <p>Infra follow-through: mialrelay moved to Resend for transactional mail, and the Cloudflare config was rebuilt around the new function topology so edge caching and bot rules could finally be expressed properly. Content pipelines that used to queue on a single worker now queue on managed queues.</p>
+      <p>Lesson: a single VM is a fine product and a lousy platform. The migration cost was mostly tests we should have written before the first deploy.</p>
+    `,
+  },
+  {
     slug: 'hero-floating-board',
     title: 'The Board, Floating',
     date: '2026-11-20',
