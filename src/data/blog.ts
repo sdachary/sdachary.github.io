@@ -20,6 +20,18 @@ const posts: BlogPost[] = [
     `,
   },
   {
+    slug: 'notion-to-github-projects',
+    title: 'The Board Moved Houses',
+    date: '2026-11-20',
+    tags: ['ops', 'notion', 'github', 'migration'],
+    body: `
+      <p>The task board is no longer Notion. The move to GitHub Projects went live on 2026-11-19, and the old workspace is retired.</p>
+      <p>The reason was boring and correct: a task board is only as good as the thing that reads it. Notion was a second brain bolted onto a first class repo. GitHub Projects puts the board next to the code, the issues, the pull requests and the runs, so there is no sync layer between "what we decided" and "what we shipped".</p>
+      <p>The migration itself was mostly a cutover. Open cards were imported, the source was closed, and the autonomy loop that used to read the Notion board now reads GitHub directly. Nothing about the loop changed except the address.</p>
+      <p>Lesson: write down where the brain lives, or the brain quietly moves somewhere you no longer control.</p>
+    `,
+  },
+  {
     slug: 'hero-floating-board',
     title: 'The Board, Floating',
     date: '2026-11-20',
