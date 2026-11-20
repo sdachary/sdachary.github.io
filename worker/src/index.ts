@@ -11,6 +11,52 @@ const MESSAGE_FIELD = 'Message'
 
 const NOTION_API_URL = 'https://api.notion.com/v1/pages'
 
+// Trust-boundary limits: a contact form does not need a 10 KB "message".
+const FIELD_MAX = { name: 100, email: 254, message: 5000 }
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+
+const RATE_LIMIT_MAX = 5
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
+const hits = new Map<string, number[]>()
+
+// ponytail: in-memory per-isolate limiter. Move to KV or Durable Objects if
+// real traffic ever needs a global budget across isolates.
+export function isRateLimited(ip: string, now = Date.now()): boolean {
+  const recent = (hits.get(ip) ?? []).filter(t => now - t < RATE_LIMIT_WINDOW_MS)
+  if (recent.length >= RATE_LIMIT_MAX) {
+    hits.set(ip, recent)
+    return true
+  }
+  recent.push(now)
+  hits.set(ip, recent)
+  if (hits.size > 10_000) {
+    for (const [key, times] of hits) {
+      if (times.every(t => now - t >= RATE_LIMIT_WINDOW_MS)) hits.delete(key)
+    }
+  }
+  return false
+}
+
+function clientIp(request: Request): string {
+  return (
+    request.headers.get('CF-Connecting-IP') ||
+    request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() ||
+    'unknown'
+  )
+}
+
+// The Pages site may be reached on a subdomain of the same GitHub Pages host.
+function isAllowedOrigin(origin: string): boolean {
+  return ALLOWED_ORIGINS.includes(origin) || /^https:\/\/[a-z0-9.-]+\.sdachary\.github\.io$/.test(origin)
+}
+
+function cleanField(value: unknown, max: number): string | null {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  if (!trimmed || trimmed.length > max) return null
+  return trimmed
+}
+
 function corsHeaders(origin: string): Record<string, string> {
   const allow = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
   return {
@@ -55,11 +101,26 @@ export default {
       return new Response('Method not allowed', { status: 405 })
     }
 
+    // Browser requests must come from the site. Requests with no Origin
+    // (curl, server-to-server) are allowed but rate limited.
+    if (origin && !isAllowedOrigin(origin)) {
+      return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
+        status: 403, headers: { ...corsHeaders(''), 'Content-Type': 'application/json' },
+      })
+    }
+
     const headers = corsHeaders(origin)
+
+    if (isRateLimited(clientIp(request))) {
+      return new Response(JSON.stringify({ error: 'Too many requests, try again later' }), {
+        status: 429,
+        headers: { ...headers, 'Content-Type': 'application/json', 'Retry-After': '600' },
+      })
+    }
 
     try {
       const body: Record<string, unknown> = await request.json()
-      const { name, email, message, website } = body as { name?: string; email?: string; message?: string; website?: string }
+      const { name, email, message, website } = body as { name?: unknown; email?: unknown; message?: unknown; website?: unknown }
 
       // Honeypot: a real user never fills the hidden "website" field. Silently
       // accept so bots see success, but never write to Notion.
@@ -69,13 +130,17 @@ export default {
         })
       }
 
-      if (!name || !email || !message) {
-        return new Response(JSON.stringify({ error: 'name, email, and message are required' }), {
+      const cleanName = cleanField(name, FIELD_MAX.name)
+      const cleanEmail = cleanField(email, FIELD_MAX.email)
+      const cleanMessage = cleanField(message, FIELD_MAX.message)
+
+      if (!cleanName || !cleanEmail || !cleanMessage || !EMAIL_RE.test(cleanEmail)) {
+        return new Response(JSON.stringify({ error: 'name, valid email, and message are required' }), {
           status: 400, headers: { ...headers, 'Content-Type': 'application/json' },
         })
       }
 
-      const result = await appendToNotion(env, name, email, message)
+      const result = await appendToNotion(env, cleanName, cleanEmail, cleanMessage)
       if (!result.ok) {
         console.error('Notion rejected:', result.detail)
         return new Response(JSON.stringify({ error: 'Notion rejected the submission' }), {

@@ -1,15 +1,33 @@
-# portfolio.sdachary.github.io — SEO / GEO consolidation
+# sdachary.github.io — portfolio of S Deepak Achary
 
-Core content: GST billing, invoice generation, tax compliance for Indian merchants.
-Main entries: / (dashboard preview), /terms, /privacy, /auth, /reset-password (disallowed from crawl).
-Features: GSTIN validation, e-invoice, TDS management, merchant profile.
-API reference: /rest/v1/* (Supabase tables), /api/auth/*.
-Structured data (JSON-LD): Organization + WebSite schema with addressCountry IN.
-Sitemap: https://portfolio.sdachary.github.io/sitemap.xml (auto-generated from build output).
-Robots: Allow /; Disallow /auth/, /reset-password, /dashboard/, /api/.
-AI crawlers: GPTBot, Google-Extended, anthropic-ai explicitly allowed.
+Human: Senior Data Analyst at Lloyds by day, AI architect and solopreneur builder by night.
+Role: data analyst, AI architect, cloud infrastructure engineer.
+Based in: Hyderabad, India.
 
-Update notes (2026-09-24):
-- Domain migrated from bepara.pages.dev → portfolio.sdachary.github.io; sitemap and robots URLs updated.
-- llms.txt added (this file) for Generative Engine Optimization.
-- AI user-agent rules added to robots.txt for GEO visibility.
+## Sections on the site
+/ — hero, about, experience, skills, projects, notes, recent activity, contact
+/manacitra.html — Mānacitra: live 3D infrastructure map of the AcharyLab ecosystem
+/privacy.html — privacy policy
+/terms.html — terms of service
+/activity.json — machine-readable deploy log
+/projects.json — machine-readable project list
+
+## Projects
+SAMPADA — personal finance app, multi-tenant, web push notifications, serverless migration.
+DARPAN — AI privacy auditor for websites, Cloudflare Worker plus Gemini, scheduled audits and PDF reports.
+MĀNACITRA — live 3D map of the service ecosystem, three.js scene, health probes.
+MCP-HUB — FastAPI tool router, skill engine, code graph analysis, multi-provider model routing.
+PRAYOG, SADHAN, UDHYAM, CHITRAGUPTA, BEPARA, VISHWAKARMA, KARMA — ecosystem services.
+
+## Writing
+/notes — engineering notes on infra migration, privacy tooling, the Mānacitra 3D build, and engineering discipline.
+
+## Technical
+Single-page React app, Vite, motion, three.js. Cloudflare Pages deployment.
+Sitemap: https://sdachary.github.io/sitemap.xml
+Robots: https://sdachary.github.io/robots.txt
+AI crawlers: GPTBot, Google-Extended, anthropic-ai allowed.
+
+Update notes (2026-11-20):
+- Rewritten: previous copy described an unrelated GST billing product and the retired portfolio.sdachary.github.io domain.
+- Domain corrected to https://sdachary.github.io/.

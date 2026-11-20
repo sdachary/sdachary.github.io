@@ -15,7 +15,6 @@ const skills: Skill[] = [
   { category: 'Infra', name: 'WireGuard' },
   { category: 'AI / Agents', name: 'Claude API' },
   { category: 'AI / Agents', name: 'MCP Protocol' },
-  { category: 'AI / Agents', name: 'n8n Automation' },
   { category: 'Frontend', name: 'React / Next.js' },
   { category: 'Frontend', name: 'TypeScript' },
   { category: 'Frontend', name: 'Tailwind CSS' },

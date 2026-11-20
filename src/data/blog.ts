@@ -51,7 +51,7 @@ const posts: BlogPost[] = [
     body: `
       <p>Sampada now sends browser push notifications — real-time alerts for transaction goals, bill reminders, and net worth milestones. The implementation spans the full stack: VAPID key generation, encrypted secret management with SOPS+age, a push subscription API, Sidekiq delivery jobs, and a service worker that handles the push event.</p>
       <p>The trickiest part was the Docker image. Sampada's code is baked into the container image, not volume-mounted. Adding the <code>webpush</code> gem meant a full image rebuild on oradb — the first build took 5+ hours because of native extensions. The solution: install the gem in the running container for immediate effect, then rebuild the image in the background for persistence.</p>
-      <p>Secrets management: VAPID keys are generated with Node.js ECDSA P-256, encrypted with SOPS+age (age1w3nwuv...), committed as <code>secrets.enc.env</code>, and decrypted at deploy time via <code>deploy.sh</code>. The age key lives on oradb at <code>~/.config/sops/age/keys.txt</code> — same pattern used across all acharylab services.</p>
+      <p>Secrets management: VAPID keys are generated with Node.js ECDSA P-256, encrypted with SOPS+age, committed as <code>secrets.enc.env</code>, and decrypted at deploy time via <code>deploy.sh</code>. The age key lives on oradb at <code>~/.config/sops/age/keys.txt</code> — same pattern used across all acharylab services.</p>
       <p>Lesson: OpenSSL 3.0 breaks the <code>webpush</code> gem's key generation (<code>pkeys are immutable</code>). Workaround: generate keys with Node.js crypto, store them encrypted, and skip the gem's generate method entirely.</p>
     `,
   },
@@ -75,7 +75,7 @@ const posts: BlogPost[] = [
     body: `
       <p>Sampada, the personal finance app, got a full multi-tenant refactor. The old model was single-user — great for me, useless for anyone else. The new model: BYO database with API keys, isolated schemas in Postgres, and Rack::Attack rate limiting.</p>
       <p>The migration touched 16 database migrations, the entire auth flow, and every controller. The hardest part was preserving backward compatibility — existing users shouldn't notice the change. Solution: a <code>current_tenant</code> method that checks API key header first, falls back to session-based user, and defaults to the original single-tenant path.</p>
-      <p>Deployed on <strong>oradb</strong> (140.245.227.176) with Docker + host Redis + Nginx nip.io proxy at <code>sampada.140.245.227.176.nip.io</code>. The multi-stage Docker build reduced image size from 1.2GB to 480MB.</p>
+      <p>Deployed on <strong>oradb</strong> with Docker + host Redis behind an Nginx reverse proxy. The multi-stage Docker build reduced image size from 1.2GB to 480MB.</p>
     `,
   },
   {
@@ -87,7 +87,7 @@ const posts: BlogPost[] = [
       <p>MCP Hub started as a simple proxy — route prompts to the cheapest available AI model. It grew into something bigger: a skill engine, a workflow orchestrator, a code-review-graph analyzer, and a memory system.</p>
       <p>The architecture is a Python FastAPI server with plugin-based tool registration. Skills are versioned Markdown files with execution metadata. The evolution engine analyzes execution results and auto-improves skills over time.</p>
       <p>The most-used feature is <code>detect_changes</code> — before I edit any repo, this tool tells me what functions I'll affect, what tests might break, and how many tokens I'll save by understanding the code graph first. It's saved me hours of context window waste.</p>
-      <p>Running on <strong>oradev</strong> (68.233.97.153), wired into my local coding agents over an SSH tunnel (<code>ssh -fNL 3001:localhost:3000 oradev</code>). Multi-provider model routing sits on top, so agents fail over between providers instead of dying when one route goes stale.</p>
+      <p>Running on <strong>oradev</strong>, wired into my local coding agents over an SSH tunnel (<code>ssh -fNL 3001:localhost:3000 oradev</code>). Multi-provider model routing sits on top, so agents fail over between providers instead of dying when one route goes stale.</p>
     `,
   },
   {

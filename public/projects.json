@@ -55,22 +55,6 @@
     "github_remote": "git@github.com:sdachary/darpan.git"
   },
   {
-    "name": "INDRA",
-    "slug": "indra",
-    "status": "Live",
-    "status_key": "live",
-    "description": "Workflow automation backbone for the ecosystem. Powered by n8n, orchestrates multi-service workflows, webhook triggers, and real-time state sync across all services. Render-hosted Docker deployment.",
-    "tags": [
-      "n8n",
-      "Docker",
-      "PostgreSQL"
-    ],
-    "live_url": "https://indra.onrender.com/",
-    "local": false,
-    "last_updated": "2026-09-04",
-    "github_remote": "git@github.com:sdachary/indra.git"
-  },
-  {
     "name": "UDHYAM",
     "slug": "udhyam",
     "status": "Live",

@@ -82,14 +82,6 @@
   {
     "kind": "feature",
     "phase": "Phase 57",
-    "project": "INDRA",
-    "description": "Indra n8n redeployed to Render — pinned 2.37.10, fixed image mismatch, created backup repo",
-    "date": "2026-09-04",
-    "status": "completed"
-  },
-  {
-    "kind": "feature",
-    "phase": "Phase 57",
     "project": "PORTFOLIO",
     "description": "Portfolio content refresh — resume update, skills sync from repos, blog posts, experience from resume",
     "date": "2026-09-04",

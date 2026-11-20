@@ -19,5 +19,5 @@
     // src/__tests__ runs under vitest (Node), not the browser.
     "types": ["node", "vitest/globals"]
   },
-  "include": ["src"]
+  "include": ["src", "worker"]
 }
