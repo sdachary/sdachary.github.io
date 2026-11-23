@@ -24,7 +24,7 @@
     "zustand": "^5.1.0"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.69.1",
+    "@cloudflare/vite-plugin": "^1.70.1",
     "@eslint/js": "^10.0.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -35,10 +35,10 @@
     "eslint-plugin-react-refresh": "^0.5.8",
     "globals": "^17.14.0",
     "happy-dom": "^21.0.4",
-    "knip": "^6.45.1",
+    "knip": "^6.46.1",
     "simple-icons": "^16.38.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.8",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.1"
   }
 }
